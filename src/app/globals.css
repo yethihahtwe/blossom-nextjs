@@ -1,3 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-500: #ef4444;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-50: #f9fafb;
+}
+
+/* Force news cards styling */
+.news-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)) !important;
+  gap: 1.5rem !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Announcement cards styling - similar to news cards */
+.announcement-card-article {
+  background: white !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  display: block !important;
+}
+
+.announcement-card-article:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px) !important;
+}
+
+.announcement-image-container {
+  position: relative !important;
+  height: 12rem !important;
+  width: 100% !important;
+  background: #f3f4f6 !important;
+}
+
+.announcement-content-container {
+  padding: 1.5rem !important;
+}
+
+.news-card-article {
+  background: white !important;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  overflow: hidden !important;
+  transition: all 0.3s ease !important;
+  display: block !important;
+}
+
+.news-card-article:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-2px) !important;
+}
+
+.news-image-container {
+  position: relative !important;
+  height: 12rem !important;
+  width: 100% !important;
+  background: #f3f4f6 !important;
+}
+
+.news-content-container {
+  padding: 1.5rem !important;
+}
+
+
+/* Search and Filter Styling removed - now using Tailwind CSS directly */
+
 /**
  * Blossom Private School Theme Styles
  * Based on design reference from web-design.jpg

@@ -1,7 +1,11 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 const Header = () => {
+  const pathname = usePathname();
   return (
     <header className="site-header" role="banner">
       <div className="header-content">
@@ -24,13 +28,12 @@ const Header = () => {
         {/* Main Navigation */}
         <nav className="main-navigation" role="navigation">
           <ul className="nav-menu">
-            <li><Link href="/">Home</Link></li>
-            <li><Link href="#about">About Us</Link></li>
-            <li><Link href="#programs">Programs</Link></li>
-            <li><Link href="/news">News</Link></li>
-            <li><Link href="/activities">Activities</Link></li>
-            <li><Link href="/announcements">Announcements</Link></li>
-            <li><Link href="#contact">Contact</Link></li>
+            <li><Link href="/" className={pathname === '/' ? 'active' : ''}>Home</Link></li>
+            <li><Link href="/#about">About Us</Link></li>
+            <li><Link href="/#programs">Programs</Link></li>
+            <li><Link href="/news" className={pathname === '/news' ? 'active' : ''}>News</Link></li>
+            <li><Link href="/announcements" className={pathname === '/announcements' ? 'active' : ''}>Announcements</Link></li>
+            <li><Link href="/#contact">Contact</Link></li>
           </ul>
           <Link href="/admissions" className="apply-now-btn">Apply Now</Link>
         </nav>
