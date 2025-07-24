@@ -45,13 +45,19 @@ export default function AnnouncementCard({ announcement, showExcerpt = true, sho
     <article className="announcement-card-article">
       <Link href={`/announcements/${announcement.slug}`} className="block">
         <div className="announcement-image-container">
-          <Image
-            src={announcement.featured_image}
-            alt={announcement.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
+          {announcement.featured_image ? (
+            <Image
+              src={announcement.featured_image}
+              alt={announcement.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400 text-sm">No Image</span>
+            </div>
+          )}
         </div>
         
         <div className="announcement-content-container">

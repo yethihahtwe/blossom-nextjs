@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { getPublishedAnnouncements, getAnnouncementPriorities, searchAnnouncements } from '@/data/mockAnnouncements';
+import { useState, useMemo, useEffect } from 'react';
+import { getPublishedAnnouncements, type Announcement } from '@/lib/announcements';
 import AnnouncementCard from '@/components/AnnouncementCard';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -13,15 +13,33 @@ export default function AnnouncementsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPriority, setSelectedPriority] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [allAnnouncements, setAllAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const allAnnouncements = getPublishedAnnouncements();
-  const priorities = getAnnouncementPriorities();
+  useEffect(() => {
+    async function fetchAnnouncements() {
+      try {
+        const announcements = await getPublishedAnnouncements();
+        setAllAnnouncements(announcements);
+      } catch (error) {
+        console.error('Error fetching announcements:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchAnnouncements();
+  }, []);
 
   const filteredAnnouncements = useMemo(() => {
     let filtered = allAnnouncements;
 
     if (searchQuery) {
-      filtered = searchAnnouncements(searchQuery);
+      // Filter by search query
+      filtered = filtered.filter(announcement => 
+        announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        announcement.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        announcement.excerpt?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
     }
 
     if (selectedPriority) {
@@ -170,14 +188,18 @@ export default function AnnouncementsPage() {
           </div>
 
           {/* Announcements Grid */}
-          {currentAnnouncements.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">Loading announcements...</p>
+            </div>
+          ) : currentAnnouncements.length > 0 ? (
             <div className="news-grid">
               {currentAnnouncements.map((announcement) => (
                 <AnnouncementCard 
                   key={announcement.id} 
                   announcement={announcement} 
                   showExcerpt={true} 
-                  showCategory={true} 
+                  showCategory={false} 
                 />
               ))}
             </div>

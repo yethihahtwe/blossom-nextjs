@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getAnnouncementBySlug, getPublishedAnnouncements } from '@/data/mockAnnouncements';
+import { getAnnouncementBySlug, getPublishedAnnouncements } from '@/lib/announcements';
 import { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -13,7 +13,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const announcement = getAnnouncementBySlug(slug);
+  const announcement = await getAnnouncementBySlug(slug);
 
   if (!announcement) {
     return {
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export async function generateStaticParams() {
-  const announcements = getPublishedAnnouncements();
+  const announcements = await getPublishedAnnouncements();
   return announcements.map((announcement) => ({
     slug: announcement.slug,
   }));
@@ -50,7 +50,7 @@ export async function generateStaticParams() {
 
 export default async function AnnouncementPage({ params }: PageProps) {
   const { slug } = await params;
-  const announcement = getAnnouncementBySlug(slug);
+  const announcement = await getAnnouncementBySlug(slug);
 
   if (!announcement || announcement.status !== 'published') {
     notFound();
@@ -88,7 +88,8 @@ export default async function AnnouncementPage({ params }: PageProps) {
     }
   };
 
-  const relatedAnnouncements = getPublishedAnnouncements()
+  const allAnnouncements = await getPublishedAnnouncements();
+  const relatedAnnouncements = allAnnouncements
     .filter(item => item.id !== announcement.id && item.priority === announcement.priority)
     .slice(0, 3);
 
@@ -136,13 +137,6 @@ export default async function AnnouncementPage({ params }: PageProps) {
               </span>
             </div>
 
-            {announcement.category && (
-              <div className="mb-4">
-                <span className="inline-block bg-gray-100 text-gray-700 text-sm font-medium px-3 py-1 rounded-full">
-                  {announcement.category}
-                </span>
-              </div>
-            )}
             
             <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
               {announcement.title}
@@ -153,12 +147,6 @@ export default async function AnnouncementPage({ params }: PageProps) {
                 {formatDate(announcement.published_at)}
               </time>
               
-              {announcement.author && (
-                <>
-                  <span>•</span>
-                  <span>By {announcement.author}</span>
-                </>
-              )}
             </div>
             
             <p className="text-xl text-gray-700 leading-relaxed mb-8">
@@ -184,22 +172,6 @@ export default async function AnnouncementPage({ params }: PageProps) {
               dangerouslySetInnerHTML={{ __html: announcement.content }}
             />
             
-            {/* Tags */}
-            {announcement.tags && announcement.tags.length > 0 && (
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Tags:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {announcement.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
