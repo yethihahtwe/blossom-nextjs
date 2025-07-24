@@ -16,12 +16,19 @@ export function AdminHeader() {
     setIsLoggingOut(true)
     try {
       await signOut()
-      router.push('/admin-login')
-      router.refresh()
+      // Small delay to ensure auth state change is processed
+      setTimeout(() => {
+        router.replace('/admin-login')
+      }, 100)
     } catch (error) {
       console.error('Logout error:', error)
+      // Force redirect even if signOut fails
+      router.replace('/admin-login')
     } finally {
-      setIsLoggingOut(false)
+      // Keep loading state until redirect happens
+      setTimeout(() => {
+        setIsLoggingOut(false)
+      }, 200)
     }
   }
 

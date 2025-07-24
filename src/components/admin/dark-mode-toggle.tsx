@@ -1,12 +1,12 @@
 'use client'
 
-import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { useTheme } from '@/components/admin/theme-provider'
 
 export function DarkModeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   // useEffect only runs on the client, so now we can safely show the UI
@@ -22,13 +22,19 @@ export function DarkModeToggle() {
     )
   }
 
-  const isDark = theme === 'dark'
+  const isDark = resolvedTheme === 'dark'
+
+  const handleToggle = () => {
+    const newTheme = isDark ? 'light' : 'dark'
+    console.log('Toggling theme from', resolvedTheme, 'to', newTheme)
+    setTheme(newTheme)
+  }
 
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      onClick={handleToggle}
       title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
       className="transition-colors"
     >

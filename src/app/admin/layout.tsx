@@ -39,7 +39,9 @@ export default function AdminLayout({
           setLoading(false)
         } else if (event === 'SIGNED_OUT') {
           setUser(null)
-          router.push('/admin-login')
+          setLoading(false)
+          // Use replace to prevent back navigation to admin
+          router.replace('/admin-login')
         }
       }
     )
@@ -61,9 +63,18 @@ export default function AdminLayout({
     )
   }
 
-  // If no user, the useEffect will redirect to login
+  // If no user, show loading while redirecting to login
   if (!user) {
-    return null
+    return (
+      <AdminThemeProvider>
+        <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 admin-panel ${montserrat.className}`}>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4"></div>
+            <p className="text-gray-600 dark:text-gray-400">Redirecting to login...</p>
+          </div>
+        </div>
+      </AdminThemeProvider>
+    )
   }
 
   return (
