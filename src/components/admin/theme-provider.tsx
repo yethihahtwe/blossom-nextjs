@@ -26,18 +26,16 @@ export function AdminThemeProvider({ children }: { children: React.ReactNode }) 
   }, [])
 
   useEffect(() => {
-    // Apply theme to document body for proper dark mode support
+    // Apply theme to document root (html element) for proper Tailwind dark mode support
     if (mounted) {
-      console.log('Applying theme to body:', theme)
-      document.body.classList.remove('light', 'dark')
-      document.body.classList.add(theme)
-      console.log('Body classes after update:', document.body.className)
+      document.documentElement.classList.remove('light', 'dark')
+      document.documentElement.classList.add(theme)
     }
 
     // Cleanup function to remove theme classes when component unmounts
     return () => {
       if (mounted) {
-        document.body.classList.remove('light', 'dark')
+        document.documentElement.classList.remove('light', 'dark')
       }
     }
   }, [theme, mounted])

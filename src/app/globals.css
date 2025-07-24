@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @theme {
   --color-red-600: #dc2626;
   --color-red-700: #b91c1c;
@@ -12,12 +14,9 @@
   --color-gray-600: #4b5563;
   --color-gray-700: #374151;
   --color-gray-50: #f9fafb;
-  
-  /* Dark mode configuration for Tailwind v4 */
   --color-gray-800: #1f2937;
   --color-gray-900: #111827;
   
-  /* Enable dark mode with class strategy */
   --default-transition-duration: 150ms;
 }
 

@@ -26,7 +26,6 @@ export function DarkModeToggle() {
 
   const handleToggle = () => {
     const newTheme = isDark ? 'light' : 'dark'
-    console.log('Toggling theme from', resolvedTheme, 'to', newTheme)
     setTheme(newTheme)
   }
 

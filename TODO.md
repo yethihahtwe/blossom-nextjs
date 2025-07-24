@@ -15,6 +15,7 @@
 - [x] Test news pages functionality and fix any issues
 
 ## Next Priority Tasks
+- [ ] Copy essential UI components from shadcn-admin (dialog, avatar, badge, separator, switch, tabs, tooltip, scroll-area)
 - [ ] Update logo sizing and alignment per design reference (web-design.jpg)
 - [ ] Create Activities page similar to News structure
 - [ ] Create Announcements page similar to News structure
