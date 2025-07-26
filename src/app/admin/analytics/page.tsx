@@ -219,7 +219,7 @@ export default function AnalyticsPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary">{item.type}</Badge>
+                    <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">{item.type}</Badge>
                     <Badge className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                       {item.view_count} views
                     </Badge>

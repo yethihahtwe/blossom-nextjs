@@ -87,8 +87,8 @@ export function AnnouncementsManagement() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Announcements</h1>
           <p className="text-gray-600 dark:text-gray-300">Manage school announcements</p>
         </div>
-        <Button className="bg-red-600 hover:bg-red-700">
-          <Plus className="h-4 w-4 mr-2" />
+        <Button className="bg-red-600 hover:bg-red-700 text-white dark:text-white">
+          <Plus className="h-4 w-4 mr-2 text-white dark:text-white" />
           New Announcement
         </Button>
       </div>

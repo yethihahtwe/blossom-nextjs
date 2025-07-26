@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bell, Search, LogOut } from 'lucide-react'
+import { Bell, Search, LogOut, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -97,6 +97,17 @@ export function AdminHeader() {
 
         {/* Right side */}
         <div className="flex items-center space-x-4">
+          {/* Visit Website */}
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => window.open('/', '_blank')}
+            className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Visit Website
+          </Button>
+
           {/* Dark Mode Toggle */}
           <DarkModeToggle />
 
