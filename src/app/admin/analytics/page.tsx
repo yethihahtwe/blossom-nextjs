@@ -127,15 +127,7 @@ export default function AnalyticsPage() {
           <p className="text-gray-600 dark:text-gray-300">View tracking and content performance analytics</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={testHealthCheck} variant="outline">
-            <Database className="h-4 w-4 mr-2" />
-            Health Check
-          </Button>
-          <Button onClick={testViewTracking} variant="outline">
-            <Eye className="h-4 w-4 mr-2" />
-            Test Tracking
-          </Button>
-          <Button onClick={loadData} disabled={loading}>
+          <Button onClick={loadData} disabled={loading} className="bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700 dark:text-white">
             <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh Data
           </Button>
@@ -243,52 +235,6 @@ export default function AnalyticsPage() {
         </CardContent>
       </Card>
 
-      {/* Available Content for Testing */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Available News Articles</CardTitle>
-            <CardDescription className="text-gray-600 dark:text-gray-300">Content available for testing</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {news.length > 0 ? (
-              <div className="space-y-2">
-                {news.slice(0, 3).map((article) => (
-                  <div key={article.id} className="p-2 bg-gray-50 dark:bg-gray-700 rounded text-sm">
-                    <p className="font-medium text-gray-900 dark:text-white">{article.title}</p>
-                    <p className="text-gray-600 dark:text-gray-300">Views: {article.view_count || 0}</p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 dark:text-gray-400">No news articles available</p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Available Announcements</CardTitle>
-            <CardDescription className="text-gray-600 dark:text-gray-300">Content available for testing</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {announcements.length > 0 ? (
-              <div className="space-y-2">
-                {announcements.slice(0, 3).map((announcement) => (
-                  <div key={announcement.id} className="p-2 bg-gray-50 dark:bg-gray-700 rounded text-sm">
-                    <p className="font-medium text-gray-900 dark:text-white">{announcement.title}</p>
-                    <p className="text-gray-600 dark:text-gray-300">
-                      Views: {announcement.view_count || 0} | Priority: {announcement.priority}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-gray-500 dark:text-gray-400">No announcements available</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
 
     </div>
   )

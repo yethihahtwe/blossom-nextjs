@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Plus, Search, Edit, Trash2, Eye, Megaphone } from 'lucide-react'
 import { getPublishedAnnouncements, type Announcement } from '@/lib/announcements'
 
@@ -34,9 +35,9 @@ export function AnnouncementsManagement() {
 
   const getPriorityBadge = (priority: string) => {
     const styles = {
-      urgent: 'bg-red-100 text-red-800',
-      important: 'bg-yellow-100 text-yellow-800',
-      normal: 'bg-green-100 text-green-800'
+      urgent: 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200',
+      important: 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200',
+      normal: 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
     }
     return styles[priority as keyof typeof styles] || styles.normal
   }
@@ -50,9 +51,28 @@ export function AnnouncementsManagement() {
             <p className="text-gray-600 dark:text-gray-300">Manage school announcements</p>
           </div>
         </div>
-        <div className="animate-pulse space-y-4">
+        <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-gray-200 rounded"></div>
+            <Card key={i}>
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-5 w-2/3" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/3" />
+                  </div>
+                  <div className="flex space-x-2 ml-4">
+                    <Skeleton className="w-8 h-8" />
+                    <Skeleton className="w-8 h-8" />
+                    <Skeleton className="w-8 h-8" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
@@ -74,23 +94,23 @@ export function AnnouncementsManagement() {
       </div>
 
       {/* Search and Filters */}
-      <Card>
+      <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <CardHeader>
-          <CardTitle>Search & Filter</CardTitle>
+          <CardTitle className="text-gray-900 dark:text-white">Search & Filter</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center space-x-4">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
               <Input
                 placeholder="Search announcements..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
               />
             </div>
-            <Button variant="outline">Filter by Priority</Button>
-            <Button variant="outline">Filter by Date</Button>
+            <Button variant="outline" className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Filter by Priority</Button>
+            <Button variant="outline" className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700">Filter by Date</Button>
           </div>
         </CardContent>
       </Card>
