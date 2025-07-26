@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { FileText, Megaphone, Users, Eye } from 'lucide-react'
 import { getPublishedNews, type News } from '@/lib/news'
 import { getPublishedAnnouncements, type Announcement } from '@/lib/announcements'
+import { getViewStats } from '@/lib/analytics'
 
 interface DashboardStats {
   totalNews: number
@@ -38,9 +39,10 @@ export function AdminDashboard() {
   useEffect(() => {
     async function fetchDashboardData() {
       try {
-        const [news, announcements] = await Promise.all([
+        const [news, announcements, viewStats] = await Promise.all([
           getPublishedNews(),
-          getPublishedAnnouncements()
+          getPublishedAnnouncements(),
+          getViewStats()
         ])
 
         const urgentCount = announcements.filter(a => a.priority === 'urgent').length
@@ -49,7 +51,7 @@ export function AdminDashboard() {
           totalNews: news.length,
           totalAnnouncements: announcements.length,
           urgentAnnouncements: urgentCount,
-          totalViews: 12500 // Mock data for now
+          totalViews: viewStats.totalViews // Real view count from database
         })
 
         // Set recent news (latest 2 items)
