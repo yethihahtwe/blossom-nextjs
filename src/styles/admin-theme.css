@@ -1,0 +1,309 @@
+/* Admin Panel Comprehensive Theming System */
+
+/* 
+ * This file establishes a comprehensive theming system for the admin panel
+ * to prevent future styling issues and ensure consistent dark/light mode support
+ */
+
+/* Root CSS Variables for Admin Panel */
+:root {
+  /* Color System */
+  --admin-bg-primary: #ffffff;
+  --admin-bg-secondary: #f8f9fa;
+  --admin-bg-tertiary: #f1f3f4;
+  --admin-bg-accent: #e3f2fd;
+  
+  --admin-text-primary: #111827;
+  --admin-text-secondary: #374151;
+  --admin-text-muted: #6b7280;
+  --admin-text-inverse: #ffffff;
+  
+  --admin-border-primary: #e5e7eb;
+  --admin-border-secondary: #d1d5db;
+  --admin-border-accent: #9ca3af;
+  
+  --admin-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --admin-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --admin-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* Brand Colors */
+  --admin-primary: #dc2626;
+  --admin-primary-hover: #b91c1c;
+  --admin-secondary: #faad13;
+  --admin-accent: #8a419a;
+  
+  /* Status Colors */
+  --admin-success: #059669;
+  --admin-success-bg: #d1fae5;
+  --admin-warning: #d97706;
+  --admin-warning-bg: #fef3c7;
+  --admin-error: #dc2626;
+  --admin-error-bg: #fee2e2;
+  --admin-info: #2563eb;
+  --admin-info-bg: #dbeafe;
+  
+  /* Interactive States */
+  --admin-hover-overlay: rgb(0 0 0 / 0.05);
+  --admin-focus-ring: #3b82f6;
+  --admin-focus-ring-offset: #ffffff;
+}
+
+/* Dark Mode Variables */
+.dark {
+  --admin-bg-primary: #111827;
+  --admin-bg-secondary: #1f2937;
+  --admin-bg-tertiary: #374151;
+  --admin-bg-accent: #1e3a8a;
+  
+  --admin-text-primary: #f9fafb;
+  --admin-text-secondary: #d1d5db;
+  --admin-text-muted: #9ca3af;
+  --admin-text-inverse: #111827;
+  
+  --admin-border-primary: #374151;
+  --admin-border-secondary: #4b5563;
+  --admin-border-accent: #6b7280;
+  
+  --admin-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --admin-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --admin-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  
+  /* Status Colors - Dark Mode */
+  --admin-success-bg: #064e3b;
+  --admin-warning-bg: #92400e;
+  --admin-error-bg: #991b1b;
+  --admin-info-bg: #1e40af;
+  
+  /* Interactive States - Dark Mode */
+  --admin-hover-overlay: rgb(255 255 255 / 0.05);
+  --admin-focus-ring-offset: #111827;
+}
+
+/* Admin Panel Scoped Styles */
+.admin-panel {
+  /* Background Colors */
+  background-color: var(--admin-bg-primary);
+  color: var(--admin-text-primary);
+  border-color: var(--admin-border-primary);
+}
+
+.admin-panel-secondary {
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-secondary);
+  border-color: var(--admin-border-secondary);
+}
+
+.admin-panel-tertiary {
+  background-color: var(--admin-bg-tertiary);
+  color: var(--admin-text-primary);
+  border-color: var(--admin-border-accent);
+}
+
+/* Popover and Dropdown Overrides */
+.admin-panel .popover-content,
+.admin-panel [data-slot="popover-content"],
+.admin-panel .dropdown-content,
+.admin-panel [data-slot="dropdown-content"] {
+  background-color: var(--admin-bg-primary) !important;
+  border-color: var(--admin-border-primary) !important;
+  color: var(--admin-text-primary) !important;
+  box-shadow: var(--admin-shadow-lg) !important;
+}
+
+/* Calendar Component Overrides */
+.admin-panel .calendar,
+.admin-panel [data-slot="calendar"] {
+  background-color: var(--admin-bg-primary) !important;
+  color: var(--admin-text-primary) !important;
+}
+
+.admin-panel .calendar-day {
+  color: var(--admin-text-primary) !important;
+}
+
+.admin-panel .calendar-day:hover {
+  background-color: var(--admin-bg-secondary) !important;
+}
+
+.admin-panel .calendar-day-selected {
+  background-color: var(--admin-primary) !important;
+  color: var(--admin-text-inverse) !important;
+}
+
+.admin-panel .calendar-day-today {
+  background-color: var(--admin-bg-accent) !important;
+  font-weight: 600;
+}
+
+/* Button Overrides */
+.admin-panel .button-primary {
+  background-color: var(--admin-primary);
+  color: var(--admin-text-inverse);
+  border-color: var(--admin-primary);
+}
+
+.admin-panel .button-primary:hover {
+  background-color: var(--admin-primary-hover);
+  border-color: var(--admin-primary-hover);
+}
+
+.admin-panel .button-secondary {
+  background-color: var(--admin-bg-secondary);
+  color: var(--admin-text-primary);
+  border-color: var(--admin-border-primary);
+}
+
+.admin-panel .button-secondary:hover {
+  background-color: var(--admin-bg-tertiary);
+}
+
+/* Input and Form Element Overrides */
+.admin-panel .form-input,
+.admin-panel input,
+.admin-panel textarea,
+.admin-panel select {
+  background-color: var(--admin-bg-primary) !important;
+  color: var(--admin-text-primary) !important;
+  border-color: var(--admin-border-primary) !important;
+}
+
+.admin-panel .form-input:focus,
+.admin-panel input:focus,
+.admin-panel textarea:focus,
+.admin-panel select:focus {
+  border-color: var(--admin-focus-ring) !important;
+  box-shadow: 0 0 0 3px rgb(59 130 246 / 0.1) !important;
+}
+
+.admin-panel .form-label {
+  color: var(--admin-text-secondary) !important;
+}
+
+/* Table Overrides */
+.admin-panel .table-header {
+  background-color: var(--admin-bg-secondary) !important;
+  color: var(--admin-text-primary) !important;
+  border-color: var(--admin-border-primary) !important;
+}
+
+.admin-panel .table-row:hover {
+  background-color: var(--admin-bg-secondary) !important;
+}
+
+.admin-panel .table-cell {
+  color: var(--admin-text-primary) !important;
+  border-color: var(--admin-border-primary) !important;
+}
+
+/* Badge and Status Overrides */
+.admin-panel .badge-success {
+  background-color: var(--admin-success-bg) !important;
+  color: var(--admin-success) !important;
+}
+
+.admin-panel .badge-warning {
+  background-color: var(--admin-warning-bg) !important;
+  color: var(--admin-warning) !important;
+}
+
+.admin-panel .badge-error {
+  background-color: var(--admin-error-bg) !important;
+  color: var(--admin-error) !important;
+}
+
+.admin-panel .badge-info {
+  background-color: var(--admin-info-bg) !important;
+  color: var(--admin-info) !important;
+}
+
+/* Skeleton Loading Overrides */
+.admin-panel .skeleton {
+  background-color: var(--admin-bg-secondary) !important;
+}
+
+/* Utility Classes */
+.admin-text-primary {
+  color: var(--admin-text-primary) !important;
+}
+
+.admin-text-secondary {
+  color: var(--admin-text-secondary) !important;
+}
+
+.admin-text-muted {
+  color: var(--admin-text-muted) !important;
+}
+
+.admin-bg-primary {
+  background-color: var(--admin-bg-primary) !important;
+}
+
+.admin-bg-secondary {
+  background-color: var(--admin-bg-secondary) !important;
+}
+
+.admin-border-primary {
+  border-color: var(--admin-border-primary) !important;
+}
+
+/* Animation and Transition Classes */
+.admin-transition {
+  transition: all 150ms ease-in-out;
+}
+
+.admin-hover:hover {
+  background-color: var(--admin-bg-secondary);
+  transform: translateY(-1px);
+  box-shadow: var(--admin-shadow-md);
+}
+
+/* Focus and Accessibility */
+.admin-focus:focus {
+  outline: 2px solid var(--admin-focus-ring);
+  outline-offset: 2px;
+}
+
+.admin-focus-visible:focus-visible {
+  outline: 2px solid var(--admin-focus-ring);
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .admin-panel {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  .admin-panel * {
+    background-color: white !important;
+    color: black !important;
+    border-color: #ccc !important;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --admin-border-primary: #000000;
+    --admin-text-primary: #000000;
+  }
+  
+  .dark {
+    --admin-border-primary: #ffffff;
+    --admin-text-primary: #ffffff;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .admin-transition {
+    transition: none;
+  }
+  
+  .admin-panel * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
