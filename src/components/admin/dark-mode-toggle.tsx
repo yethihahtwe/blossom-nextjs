@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Moon, Sun } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import { useTheme } from '@/components/admin/theme-provider'
 
 export function DarkModeToggle() {
@@ -16,32 +16,29 @@ export function DarkModeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" disabled>
-        <div className="h-5 w-5" />
-      </Button>
+      <div className="flex items-center space-x-2">
+        <Sun className="h-4 w-4 text-gray-400" />
+        <Switch disabled />
+        <Moon className="h-4 w-4 text-gray-400" />
+      </div>
     )
   }
 
   const isDark = resolvedTheme === 'dark'
 
-  const handleToggle = () => {
-    const newTheme = isDark ? 'light' : 'dark'
-    setTheme(newTheme)
+  const handleToggle = (checked: boolean) => {
+    setTheme(checked ? 'dark' : 'light')
   }
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={handleToggle}
-      title={`Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className="transition-colors"
-    >
-      {isDark ? (
-        <Sun className="h-5 w-5 text-yellow-500" />
-      ) : (
-        <Moon className="h-5 w-5 text-gray-700 dark:text-gray-300" />
-      )}
-    </Button>
+    <div className="flex items-center space-x-2" title={`Switch to ${isDark ? 'light' : 'dark'} mode`}>
+      <Sun className={`h-4 w-4 transition-colors ${isDark ? 'text-gray-400' : 'text-yellow-500'}`} />
+      <Switch
+        checked={isDark}
+        onCheckedChange={handleToggle}
+        aria-label="Toggle dark mode"
+      />
+      <Moon className={`h-4 w-4 transition-colors ${isDark ? 'text-blue-400' : 'text-gray-400'}`} />
+    </div>
   )
 }

@@ -132,7 +132,7 @@ export default function AdminLoginPage() {
               <Button
                 type="submit"
                 disabled={loading || !email || !password}
-                className="w-full bg-red-600 hover:bg-red-700"
+                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold"
               >
                 {loading ? (
                   <div className="flex items-center">

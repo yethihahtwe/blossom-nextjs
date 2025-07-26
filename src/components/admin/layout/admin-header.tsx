@@ -5,15 +5,26 @@ import { useRouter } from 'next/navigation'
 import { Bell, Search, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { signOut } from '@/lib/auth'
 import { DarkModeToggle } from '@/components/admin/dark-mode-toggle'
 
 export function AdminHeader() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const router = useRouter()
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
+    setShowLogoutDialog(false)
     try {
       await signOut()
       // Small delay to ensure auth state change is processed
@@ -61,19 +72,53 @@ export function AdminHeader() {
           {/* Profile & Logout */}
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-700 dark:text-gray-300">Welcome back, Admin</span>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              title="Sign out"
-            >
-              {isLoggingOut ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 dark:border-gray-400"></div>
-              ) : (
-                <LogOut className="h-5 w-5" />
-              )}
-            </Button>
+            <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+              <DialogTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  disabled={isLoggingOut}
+                  title="Sign out"
+                >
+                  {isLoggingOut ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 dark:border-gray-400"></div>
+                  ) : (
+                    <LogOut className="h-5 w-5" />
+                  )}
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Confirm Logout</DialogTitle>
+                  <DialogDescription>
+                    Are you sure you want to sign out? You will need to enter your credentials again to access the admin panel.
+                  </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowLogoutDialog(false)}
+                    disabled={isLoggingOut}
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="bg-red-600 hover:bg-red-700 text-white"
+                  >
+                    {isLoggingOut ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Signing out...
+                      </>
+                    ) : (
+                      'Sign out'
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
