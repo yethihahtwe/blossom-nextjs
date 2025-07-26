@@ -10,6 +10,7 @@ import {
   Megaphone,
   Users,
   Settings,
+  BarChart3,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react'
@@ -39,6 +40,11 @@ const navigation = [
     name: 'Settings',
     href: '/admin/settings',
     icon: Settings,
+  },
+  {
+    name: 'Analytics',
+    href: '/admin/analytics',
+    icon: BarChart3,
   },
 ]
 

@@ -1,0 +1,295 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { RefreshCw, Database, Eye, TrendingUp } from 'lucide-react'
+import { getViewStats, getTopContent, getRecentViewTrends } from '@/lib/analytics'
+import { getPublishedNews } from '@/lib/news'
+import { getPublishedAnnouncements } from '@/lib/announcements'
+
+export default function AnalyticsPage() {
+  const [viewStats, setViewStats] = useState<any>(null)
+  const [topContent, setTopContent] = useState<any[]>([])
+  const [recentTrends, setRecentTrends] = useState<any[]>([])
+  const [testResults, setTestResults] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [news, setNews] = useState<any[]>([])
+  const [announcements, setAnnouncements] = useState<any[]>([])
+
+  const loadData = async () => {
+    setLoading(true)
+    try {
+      const [statsData, topData, trendsData, newsData, announcementsData] = await Promise.all([
+        getViewStats(),
+        getTopContent(5),
+        getRecentViewTrends(),
+        getPublishedNews(),
+        getPublishedAnnouncements()
+      ])
+      
+      setViewStats(statsData)
+      setTopContent(topData)
+      setRecentTrends(trendsData)
+      setNews(newsData)
+      setAnnouncements(announcementsData)
+    } catch (error) {
+      console.error('Error loading analytics:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const testViewTracking = async () => {
+    if (news.length === 0 && announcements.length === 0) {
+      alert('No content available to test with!')
+      return
+    }
+
+    const results = []
+    
+    // Test with first news article if available
+    if (news.length > 0) {
+      try {
+        const response = await fetch('/api/track-view', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'news', id: news[0].id })
+        })
+        const result = await response.json()
+        results.push({
+          type: 'News',
+          title: news[0].title,
+          success: response.ok,
+          result: result
+        })
+      } catch (error) {
+        results.push({
+          type: 'News',
+          title: news[0].title,
+          success: false,
+          error: error.message
+        })
+      }
+    }
+
+    // Test with first announcement if available
+    if (announcements.length > 0) {
+      try {
+        const response = await fetch('/api/track-view', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'announcement', id: announcements[0].id })
+        })
+        const result = await response.json()
+        results.push({
+          type: 'Announcement',
+          title: announcements[0].title,
+          success: response.ok,
+          result: result
+        })
+      } catch (error) {
+        results.push({
+          type: 'Announcement',
+          title: announcements[0].title,
+          success: false,
+          error: error.message
+        })
+      }
+    }
+
+    setTestResults(results)
+    
+    // Reload analytics after testing
+    setTimeout(loadData, 1000)
+  }
+
+  const testHealthCheck = async () => {
+    try {
+      const response = await fetch('/api/track-view')
+      const result = await response.json()
+      alert(`Health Check: ${result.status} - ${result.message || 'Success'}`)
+    } catch (error) {
+      alert(`Health Check Failed: ${error.message}`)
+    }
+  }
+
+  useEffect(() => {
+    loadData()
+  }, [])
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analytics</h1>
+          <p className="text-gray-600 dark:text-gray-300">View tracking and content performance analytics</p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={testHealthCheck} variant="outline">
+            <Database className="h-4 w-4 mr-2" />
+            Health Check
+          </Button>
+          <Button onClick={testViewTracking} variant="outline">
+            <Eye className="h-4 w-4 mr-2" />
+            Test Tracking
+          </Button>
+          <Button onClick={loadData} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh Data
+          </Button>
+        </div>
+      </div>
+
+      {/* View Statistics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-gray-900 dark:text-white">View Statistics</CardTitle>
+          <CardDescription className="text-gray-600 dark:text-gray-300">Current analytics overview</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {viewStats ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{viewStats.totalViews}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Total Views</div>
+              </div>
+              <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{viewStats.newsViews}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">News Views</div>
+              </div>
+              <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded">
+                <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{viewStats.announcementViews}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Announcement Views</div>
+              </div>
+              <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded">
+                <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{viewStats.avgViewsPerNews}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Avg Views/News</div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              {loading ? 'Loading analytics...' : 'No analytics data available'}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Test Results */}
+      {testResults.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-white">Test Results</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-300">View tracking test outcomes</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {testResults.map((result, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">{result.type}: {result.title}</p>
+                    {result.success ? (
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        New view count: {result.result?.newViewCount || 'Unknown'}
+                      </p>
+                    ) : (
+                      <p className="text-sm text-red-600 dark:text-red-400">
+                        Error: {result.error || 'Failed to track view'}
+                      </p>
+                    )}
+                  </div>
+                  <Badge variant={result.success ? 'default' : 'destructive'}>
+                    {result.success ? 'Success' : 'Failed'}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Top Content */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-gray-900 dark:text-white">Top Viewed Content</CardTitle>
+          <CardDescription className="text-gray-600 dark:text-gray-300">Most popular articles and announcements</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {topContent.length > 0 ? (
+            <div className="space-y-3">
+              {topContent.map((item, index) => (
+                <div key={`${item.type}-${item.id}`} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                  <div>
+                    <p className="font-medium text-gray-900 dark:text-white">{item.title}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {new Date(item.published_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary">{item.type}</Badge>
+                    <Badge className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                      {item.view_count} views
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              No viewed content yet. Run some tests to generate data!
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Available Content for Testing */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-white">Available News Articles</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-300">Content available for testing</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {news.length > 0 ? (
+              <div className="space-y-2">
+                {news.slice(0, 3).map((article) => (
+                  <div key={article.id} className="p-2 bg-gray-50 dark:bg-gray-700 rounded text-sm">
+                    <p className="font-medium text-gray-900 dark:text-white">{article.title}</p>
+                    <p className="text-gray-600 dark:text-gray-300">Views: {article.view_count || 0}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 dark:text-gray-400">No news articles available</p>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-gray-900 dark:text-white">Available Announcements</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-300">Content available for testing</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {announcements.length > 0 ? (
+              <div className="space-y-2">
+                {announcements.slice(0, 3).map((announcement) => (
+                  <div key={announcement.id} className="p-2 bg-gray-50 dark:bg-gray-700 rounded text-sm">
+                    <p className="font-medium text-gray-900 dark:text-white">{announcement.title}</p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      Views: {announcement.view_count || 0} | Priority: {announcement.priority}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 dark:text-gray-400">No announcements available</p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+    </div>
+  )
+}
