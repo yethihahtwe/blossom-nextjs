@@ -46,8 +46,8 @@ export function AnnouncementsManagement() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Announcements</h1>
-            <p className="text-gray-600">Manage school announcements</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Announcements</h1>
+            <p className="text-gray-600 dark:text-gray-300">Manage school announcements</p>
           </div>
         </div>
         <div className="animate-pulse space-y-4">
@@ -64,8 +64,8 @@ export function AnnouncementsManagement() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Announcements</h1>
-          <p className="text-gray-600">Manage school announcements</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Announcements</h1>
+          <p className="text-gray-600 dark:text-gray-300">Manage school announcements</p>
         </div>
         <Button className="bg-red-600 hover:bg-red-700">
           <Plus className="h-4 w-4 mr-2" />
@@ -103,17 +103,17 @@ export function AnnouncementsManagement() {
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-semibold text-gray-900">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                       {announcement.title}
                     </h3>
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${getPriorityBadge(announcement.priority)}`}>
                       {announcement.priority.toUpperCase()}
                     </span>
                   </div>
-                  <p className="text-gray-600 mb-3 line-clamp-2">
+                  <p className="text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
                     {announcement.excerpt}
                   </p>
-                  <div className="flex items-center text-sm text-gray-500 space-x-4">
+                  <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 space-x-4">
                     <span>Published: {new Date(announcement.published_at).toLocaleDateString()}</span>
                     <span>Status: {announcement.status}</span>
                   </div>
@@ -138,9 +138,9 @@ export function AnnouncementsManagement() {
       {filteredAnnouncements.length === 0 && (
         <Card>
           <CardContent className="text-center py-12">
-            <Megaphone className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No announcements found</h3>
-            <p className="text-gray-600">
+            <Megaphone className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No announcements found</h3>
+            <p className="text-gray-600 dark:text-gray-300">
               {searchQuery ? 'Try adjusting your search terms.' : 'Get started by creating your first announcement.'}
             </p>
           </CardContent>

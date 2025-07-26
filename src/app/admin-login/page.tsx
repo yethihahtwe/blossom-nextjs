@@ -55,7 +55,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className={`min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 admin-panel ${montserrat.className}`}>
+    <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 admin-panel ${montserrat.className}`}>
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
@@ -64,10 +64,10 @@ export default function AdminLoginPage() {
               <span className="text-white font-bold text-xl">B</span>
             </div>
           </div>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="mt-6 text-3xl font-bold text-gray-900 dark:text-white">
             Admin Login
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
             Sign in to access the Blossom International School admin panel
           </p>
         </div>
@@ -117,7 +117,7 @@ export default function AdminLoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400"
                     disabled={loading}
                   >
                     {showPassword ? (
@@ -149,7 +149,7 @@ export default function AdminLoginPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Forgot your password?{' '}
                 <button
                   type="button"
@@ -168,7 +168,7 @@ export default function AdminLoginPage() {
 
         {/* Development Note */}
         <div className="text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             For development: Use any valid Supabase user credentials
           </p>
         </div>

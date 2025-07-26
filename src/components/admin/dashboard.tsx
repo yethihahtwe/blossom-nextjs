@@ -140,24 +140,24 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Recent News</CardTitle>
-            <CardDescription>Latest published news articles</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">Recent News</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-300">Latest published news articles</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
                 <div>
-                  <p className="font-medium text-sm">Latest School Updates</p>
-                  <p className="text-xs text-gray-500">Published 2 hours ago</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">Latest School Updates</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Published 2 hours ago</p>
                 </div>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Published</span>
+                <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">Published</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
                 <div>
-                  <p className="font-medium text-sm">New Programs Available</p>
-                  <p className="text-xs text-gray-500">Published 1 day ago</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">New Programs Available</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Published 1 day ago</p>
                 </div>
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Published</span>
+                <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">Published</span>
               </div>
             </div>
           </CardContent>
@@ -165,24 +165,24 @@ export function AdminDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent Announcements</CardTitle>
-            <CardDescription>Latest published announcements</CardDescription>
+            <CardTitle className="text-gray-900 dark:text-white">Recent Announcements</CardTitle>
+            <CardDescription className="text-gray-600 dark:text-gray-300">Latest published announcements</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
                 <div>
-                  <p className="font-medium text-sm">Emergency School Closure</p>
-                  <p className="text-xs text-gray-500">Published 1 hour ago</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">Emergency School Closure</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Published 1 hour ago</p>
                 </div>
-                <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">Urgent</span>
+                <span className="text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">Urgent</span>
               </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
+              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
                 <div>
-                  <p className="font-medium text-sm">Parent-Teacher Meeting</p>
-                  <p className="text-xs text-gray-500">Published 3 hours ago</p>
+                  <p className="font-medium text-sm text-gray-900 dark:text-white">Parent-Teacher Meeting</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Published 3 hours ago</p>
                 </div>
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Important</span>
+                <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">Important</span>
               </div>
             </div>
           </CardContent>

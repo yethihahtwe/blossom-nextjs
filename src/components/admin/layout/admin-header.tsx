@@ -83,7 +83,7 @@ export function AdminHeader() {
                   {isLoggingOut ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 dark:border-gray-400"></div>
                   ) : (
-                    <LogOut className="h-5 w-5" />
+                    <LogOut className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                   )}
                 </Button>
               </DialogTrigger>
@@ -99,6 +99,7 @@ export function AdminHeader() {
                     variant="outline" 
                     onClick={() => setShowLogoutDialog(false)}
                     disabled={isLoggingOut}
+                    className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                   >
                     Cancel
                   </Button>
