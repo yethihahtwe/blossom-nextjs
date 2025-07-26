@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Bell, Search, LogOut } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -16,11 +16,39 @@ import {
 } from '@/components/ui/dialog'
 import { signOut } from '@/lib/auth'
 import { DarkModeToggle } from '@/components/admin/dark-mode-toggle'
+import { SearchResults } from '@/components/admin/search-results'
+import { useAdminSearch } from '@/hooks/useAdminSearch'
 
 export function AdminHeader() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const router = useRouter()
+  const searchRef = useRef<HTMLDivElement>(null)
+  
+  // Search functionality
+  const {
+    searchQuery,
+    searchResults,
+    isOpen,
+    loading,
+    handleSearch,
+    clearSearch,
+    setIsOpen
+  } = useAdminSearch()
+
+  // Close search results when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [setIsOpen])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -47,13 +75,22 @@ export function AdminHeader() {
     <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 transition-colors">
       <div className="flex h-16 items-center justify-between px-6">
         {/* Search */}
-        <div className="flex items-center flex-1 max-w-md">
+        <div className="flex items-center flex-1 max-w-md" ref={searchRef}>
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
             <Input
               type="text"
-              placeholder="Search..."
-              className="pl-10 pr-4 py-2 w-full"
+              placeholder="Search news and announcements..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              onFocus={() => searchQuery && setIsOpen(true)}
+              className="pl-10 pr-4 py-2 w-full bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder:text-gray-500 dark:placeholder:text-gray-400"
+            />
+            <SearchResults
+              results={searchResults}
+              isOpen={isOpen}
+              onClose={clearSearch}
+              query={searchQuery}
             />
           </div>
         </div>

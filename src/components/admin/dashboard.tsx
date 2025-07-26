@@ -3,14 +3,25 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Megaphone, Users, Eye } from 'lucide-react'
-import { getPublishedNews } from '@/lib/news'
-import { getPublishedAnnouncements } from '@/lib/announcements'
+import { getPublishedNews, type News } from '@/lib/news'
+import { getPublishedAnnouncements, type Announcement } from '@/lib/announcements'
 
 interface DashboardStats {
   totalNews: number
   totalAnnouncements: number
   urgentAnnouncements: number
   totalViews: number
+}
+
+function getPriorityColors(priority: string) {
+  switch (priority) {
+    case 'urgent':
+      return 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200'
+    case 'important':
+      return 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
+    default:
+      return 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+  }
 }
 
 export function AdminDashboard() {
@@ -20,6 +31,8 @@ export function AdminDashboard() {
     urgentAnnouncements: 0,
     totalViews: 0
   })
+  const [recentNews, setRecentNews] = useState<News[]>([])
+  const [recentAnnouncements, setRecentAnnouncements] = useState<Announcement[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -38,6 +51,12 @@ export function AdminDashboard() {
           urgentAnnouncements: urgentCount,
           totalViews: 12500 // Mock data for now
         })
+
+        // Set recent news (latest 2 items)
+        setRecentNews(news.slice(0, 2))
+        
+        // Set recent announcements (latest 2 items)
+        setRecentAnnouncements(announcements.slice(0, 2))
       } catch (error) {
         console.error('Error fetching dashboard data:', error)
       } finally {
@@ -145,20 +164,25 @@ export function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                <div>
-                  <p className="font-medium text-sm text-gray-900 dark:text-white">Latest School Updates</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Published 2 hours ago</p>
+              {recentNews.length > 0 ? (
+                recentNews.map((article) => (
+                  <div key={article.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                    <div>
+                      <p className="font-medium text-sm text-gray-900 dark:text-white">{article.title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Published {new Date(article.published_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">
+                      {article.status}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                  <p className="text-sm">No recent news articles found</p>
                 </div>
-                <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">Published</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                <div>
-                  <p className="font-medium text-sm text-gray-900 dark:text-white">New Programs Available</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Published 1 day ago</p>
-                </div>
-                <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">Published</span>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -170,20 +194,25 @@ export function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                <div>
-                  <p className="font-medium text-sm text-gray-900 dark:text-white">Emergency School Closure</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Published 1 hour ago</p>
+              {recentAnnouncements.length > 0 ? (
+                recentAnnouncements.map((announcement) => (
+                  <div key={announcement.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
+                    <div>
+                      <p className="font-medium text-sm text-gray-900 dark:text-white">{announcement.title}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        Published {new Date(announcement.published_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded ${getPriorityColors(announcement.priority)}`}>
+                      {announcement.priority.toUpperCase()}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                  <p className="text-sm">No recent announcements found</p>
                 </div>
-                <span className="text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded">Urgent</span>
-              </div>
-              <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                <div>
-                  <p className="font-medium text-sm text-gray-900 dark:text-white">Parent-Teacher Meeting</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Published 3 hours ago</p>
-                </div>
-                <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded">Important</span>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
