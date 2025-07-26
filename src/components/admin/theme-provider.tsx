@@ -30,12 +30,17 @@ export function AdminThemeProvider({ children }: { children: React.ReactNode }) 
     if (mounted) {
       document.documentElement.classList.remove('light', 'dark')
       document.documentElement.classList.add(theme)
+      
+      // Also apply to body to ensure portals inherit theme
+      document.body.classList.remove('light', 'dark')
+      document.body.classList.add(theme)
     }
 
     // Cleanup function to remove theme classes when component unmounts
     return () => {
       if (mounted) {
         document.documentElement.classList.remove('light', 'dark')
+        document.body.classList.remove('light', 'dark')
       }
     }
   }, [theme, mounted])
