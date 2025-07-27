@@ -295,6 +295,301 @@
   }
 }
 
+/* Active Filters Section Styling */
+.admin-filters-container {
+  min-height: 2.5rem; /* 40px - ensures consistent space */
+  transition: all 150ms ease-in-out;
+}
+
+.admin-filter-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: var(--admin-text-xs);
+  font-weight: var(--admin-font-weight-medium);
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 150ms ease-in-out;
+  user-select: none;
+}
+
+.admin-filter-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--admin-shadow-sm);
+}
+
+.admin-filter-badge-search {
+  background-color: rgb(219 234 254); /* blue-100 */
+  color: rgb(30 58 138); /* blue-800 */
+  border-color: rgb(191 219 254); /* blue-200 */
+}
+
+.dark .admin-filter-badge-search {
+  background-color: rgb(30 58 138); /* blue-900 */
+  color: rgb(191 219 254); /* blue-200 */
+  border-color: rgb(29 78 216); /* blue-700 */
+}
+
+.admin-filter-badge-search:hover {
+  background-color: rgb(191 219 254); /* blue-200 */
+  color: rgb(29 78 216); /* blue-700 */
+}
+
+.dark .admin-filter-badge-search:hover {
+  background-color: rgb(29 78 216); /* blue-800 */
+  color: rgb(219 234 254); /* blue-100 */
+}
+
+.admin-filter-badge-category {
+  background-color: rgb(220 252 231); /* green-100 */
+  color: rgb(22 101 52); /* green-800 */
+  border-color: rgb(187 247 208); /* green-200 */
+}
+
+.dark .admin-filter-badge-category {
+  background-color: rgb(20 83 45); /* green-900 */
+  color: rgb(187 247 208); /* green-200 */
+  border-color: rgb(21 128 61); /* green-700 */
+}
+
+.admin-filter-badge-category:hover {
+  background-color: rgb(187 247 208); /* green-200 */
+  color: rgb(21 128 61); /* green-700 */
+}
+
+.dark .admin-filter-badge-category:hover {
+  background-color: rgb(21 128 61); /* green-800 */
+  color: rgb(220 252 231); /* green-100 */
+}
+
+.admin-filter-badge-date {
+  background-color: rgb(237 233 254); /* purple-100 */
+  color: rgb(88 28 135); /* purple-800 */
+  border-color: rgb(221 214 254); /* purple-200 */
+}
+
+.dark .admin-filter-badge-date {
+  background-color: rgb(76 29 149); /* purple-900 */
+  color: rgb(221 214 254); /* purple-200 */
+  border-color: rgb(109 40 217); /* purple-700 */
+}
+
+.admin-filter-badge-date:hover {
+  background-color: rgb(221 214 254); /* purple-200 */
+  color: rgb(109 40 217); /* purple-700 */
+}
+
+.dark .admin-filter-badge-date:hover {
+  background-color: rgb(109 40 217); /* purple-800 */
+  color: rgb(237 233 254); /* purple-100 */
+}
+
+.admin-filter-remove-icon {
+  margin-left: 0.25rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  transition: color 150ms ease-in-out;
+}
+
+.admin-clear-filters-btn {
+  font-size: var(--admin-text-xs);
+  font-weight: var(--admin-font-weight-medium);
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  transition: all 150ms ease-in-out;
+  border: 1px solid transparent;
+}
+
+.admin-clear-filters-btn:hover {
+  background-color: var(--admin-bg-secondary);
+  border-color: var(--admin-border-primary);
+}
+
+/* Compact Calendar Styling */
+.compact-calendar {
+  font-size: 0.875rem; /* 14px - smaller base font */
+  padding: 0.5rem; /* Reduced padding */
+}
+
+.compact-calendar .rdp-months {
+  margin: 0;
+}
+
+.compact-calendar .rdp-month {
+  margin: 0;
+  padding: 0;
+}
+
+.compact-calendar .rdp-caption {
+  padding: 0.25rem 0;
+  margin-bottom: 0.5rem;
+}
+
+.compact-calendar .rdp-caption_label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.compact-calendar .rdp-nav_button {
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.75rem;
+}
+
+.compact-calendar .rdp-head_cell {
+  width: 2rem;
+  height: 1.5rem;
+  font-size: 0.75rem;
+  padding: 0;
+}
+
+.compact-calendar .rdp-cell {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+}
+
+.compact-calendar .rdp-day {
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.75rem;
+  padding: 0;
+  margin: 0;
+}
+
+/* Enhanced Date Range Selection Styling */
+.compact-calendar .rdp-day_range_start {
+  background-color: #2563eb !important; /* blue-600 */
+  color: white !important;
+  border-radius: 0.375rem 0 0 0.375rem;
+  font-weight: 600;
+  position: relative;
+}
+
+.compact-calendar .rdp-day_range_end {
+  background-color: #2563eb !important; /* blue-600 */
+  color: white !important;
+  border-radius: 0 0.375rem 0.375rem 0;
+  font-weight: 600;
+  position: relative;
+}
+
+.compact-calendar .rdp-day_range_middle {
+  background-color: #dbeafe !important; /* blue-100 */
+  color: #1e40af !important; /* blue-800 */
+  border-radius: 0;
+  font-weight: 500;
+}
+
+.dark .compact-calendar .rdp-day_range_middle {
+  background-color: #1e40af !important; /* blue-800 */
+  color: #dbeafe !important; /* blue-100 */
+}
+
+.compact-calendar .rdp-day_range_start.rdp-day_range_end {
+  border-radius: 0.375rem;
+}
+
+/* Single date selection (when start and end are the same) */
+.compact-calendar .rdp-day_selected:not(.rdp-day_range_start):not(.rdp-day_range_end):not(.rdp-day_range_middle) {
+  background-color: #2563eb !important;
+  color: white !important;
+  border-radius: 0.375rem;
+  font-weight: 600;
+}
+
+/* Hover states for better UX */
+.compact-calendar .rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_range_start):not(.rdp-day_range_end):not(.rdp-day_range_middle) {
+  background-color: #f3f4f6 !important; /* gray-100 */
+  color: #374151 !important; /* gray-700 */
+}
+
+.dark .compact-calendar .rdp-day:hover:not(.rdp-day_selected):not(.rdp-day_range_start):not(.rdp-day_range_end):not(.rdp-day_range_middle) {
+  background-color: #4b5563 !important; /* gray-600 */
+  color: #f9fafb !important; /* gray-50 */
+}
+
+/* Today indicator with range support */
+.compact-calendar .rdp-day_today:not(.rdp-day_selected):not(.rdp-day_range_start):not(.rdp-day_range_end):not(.rdp-day_range_middle) {
+  background-color: #e5e7eb !important; /* gray-200 */
+  color: #374151 !important; /* gray-700 */
+  font-weight: 600;
+}
+
+.dark .compact-calendar .rdp-day_today:not(.rdp-day_selected):not(.rdp-day_range_start):not(.rdp-day_range_end):not(.rdp-day_range_middle) {
+  background-color: #6b7280 !important; /* gray-500 */
+  color: #f9fafb !important; /* gray-50 */
+}
+
+/* Range preview on hover */
+.compact-calendar .rdp-day_range_start::after,
+.compact-calendar .rdp-day_range_end::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border: 2px solid #3b82f6;
+  border-radius: 0.5rem;
+  pointer-events: none;
+}
+
+/* Responsive Active Filters */
+@media (max-width: 768px) {
+  .admin-filters-container {
+    min-height: 3rem; /* More space on mobile for wrapping */
+  }
+  
+  .admin-filter-badge {
+    font-size: 0.7rem; /* Slightly smaller on mobile */
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .admin-clear-filters-btn {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    margin-top: 0.25rem;
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Mobile calendar adjustments */
+  .compact-calendar .rdp-head_cell,
+  .compact-calendar .rdp-cell,
+  .compact-calendar .rdp-day {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+  
+  .compact-calendar .rdp-day {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-filters-container {
+    min-height: 4rem; /* Even more space on small screens */
+  }
+  
+  /* Even smaller calendar on mobile */
+  .compact-calendar .rdp-head_cell,
+  .compact-calendar .rdp-cell,
+  .compact-calendar .rdp-day {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  
+  .compact-calendar .rdp-day {
+    font-size: 0.65rem;
+  }
+  
+  .compact-calendar {
+    padding: 0.25rem;
+  }
+}
+
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
   .admin-transition {
@@ -305,5 +600,11 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  
+  .admin-filter-badge,
+  .admin-clear-filters-btn {
+    transition: none !important;
+    transform: none !important;
   }
 }

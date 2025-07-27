@@ -53,7 +53,7 @@ export default function AdminLayout({
   if (loading) {
     return (
       <AdminThemeProvider>
-        <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 admin-panel ${montserrat.className}`}>
+        <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 admin-panel ${montserrat.className}`} data-admin-panel>
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4"></div>
             <p className="text-gray-600 dark:text-gray-400">Loading...</p>
@@ -67,7 +67,7 @@ export default function AdminLayout({
   if (!user) {
     return (
       <AdminThemeProvider>
-        <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 admin-panel ${montserrat.className}`}>
+        <div className={`min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 admin-panel ${montserrat.className}`} data-admin-panel>
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600 mx-auto mb-4"></div>
             <p className="text-gray-600 dark:text-gray-400">Redirecting to login...</p>
@@ -79,7 +79,7 @@ export default function AdminLayout({
 
   return (
     <AdminThemeProvider>
-      <div className={`flex h-screen bg-gray-100 dark:bg-gray-900 admin-panel ${montserrat.className}`}>
+      <div className={`flex h-screen bg-gray-100 dark:bg-gray-900 admin-panel ${montserrat.className}`} data-admin-panel>
         <AdminSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <AdminHeader />

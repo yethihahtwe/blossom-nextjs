@@ -211,158 +211,185 @@ export function NewsTable() {
         </Button>
       </div>
 
-      {/* Active Filters Display */}
-      {hasActiveFilters && (
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm text-gray-600 dark:text-gray-400">Active filters:</span>
-          {searchQuery && (
-            <Badge variant="secondary" className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-              Search: {searchQuery}
-              <X className="ml-1 h-3 w-3 cursor-pointer" onClick={() => setSearchQuery('')} />
-            </Badge>
-          )}
-          {selectedCategories.map(categoryId => {
-            const category = mockCategories.find(c => c.id === categoryId)
-            return (
-              <Badge key={categoryId} variant="secondary" className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                {category?.name}
-                <X className="ml-1 h-3 w-3 cursor-pointer" onClick={() => handleCategoryToggle(categoryId)} />
-              </Badge>
-            )
-          })}
-          {(dateRange.from || dateRange.to) && (
-            <Badge variant="secondary" className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
-              Date: {dateRange.from ? format(dateRange.from, 'MMM dd') : '...'} - {dateRange.to ? format(dateRange.to, 'MMM dd') : '...'}
-              <X className="ml-1 h-3 w-3 cursor-pointer" onClick={() => setDateRange({ from: undefined, to: undefined })} />
-            </Badge>
-          )}
-          <Button variant="ghost" size="sm" onClick={clearFilters} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-            Clear all
-          </Button>
-        </div>
-      )}
 
-      {/* News Table with Integrated Search and Filters */}
+      {/* News Table with Search and Filters */}
       <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <CardContent className="p-0">
+          {/* Search and Filter Section */}
+          <div className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600 p-6 space-y-4">
+            {/* Search Row */}
+            <div className="flex items-center justify-between gap-4">
+              {/* Search on the left */}
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+                <Input
+                  placeholder="Search news articles..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    setCurrentPage(1)
+                  }}
+                  className="pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 admin-panel"
+                />
+              </div>
+              
+              {/* Filters on the right */}
+              <div className="flex items-center gap-2">
+                {/* Category Filter */}
+                <Popover open={isCategoryFilterOpen} onOpenChange={setIsCategoryFilterOpen}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className={`border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 admin-panel transition-colors ${selectedCategories.length > 0 ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''}`}
+                    >
+                      <Filter className="h-4 w-4 mr-2" />
+                      Categories
+                      {selectedCategories.length > 0 && (
+                        <Badge className="ml-2 h-5 w-5 p-0 text-xs bg-blue-600 text-white flex items-center justify-center">
+                          {selectedCategories.length}
+                        </Badge>
+                      )}
+                      <ChevronDown className="h-4 w-4 ml-1" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg admin-panel" align="end" data-admin-panel>
+                    <div className="space-y-4">
+                      <h4 className="admin-font-medium text-gray-900 dark:text-white admin-text-base">Filter by Category</h4>
+                      <div className="space-y-2">
+                        {mockCategories.map((category) => (
+                          <div key={category.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={category.id}
+                              checked={selectedCategories.includes(category.id)}
+                              onCheckedChange={() => handleCategoryToggle(category.id)}
+                            />
+                            <Label 
+                              htmlFor={category.id}
+                              className="admin-text-sm text-gray-700 dark:text-gray-300 cursor-pointer admin-font-normal"
+                            >
+                              {category.name}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                      {selectedCategories.length > 0 && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setSelectedCategories([])}
+                          className="w-full admin-panel"
+                        >
+                          Clear Categories
+                        </Button>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+
+                {/* Date Filter */}
+                <Popover open={isDateFilterOpen} onOpenChange={setIsDateFilterOpen}>
+                  <PopoverTrigger asChild>
+                    <Button 
+                      variant="outline"
+                      className={`border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 admin-panel transition-colors ${(dateRange.from || dateRange.to) ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-600' : ''}`}
+                    >
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      Date Range
+                      <ChevronDown className="h-4 w-4 ml-1" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg admin-panel" align="end" data-admin-panel>
+                    <div className="p-3 space-y-3">
+                      <h4 className="font-medium text-gray-900 dark:text-white text-sm">Select Date Range</h4>
+                      <Calendar
+                        mode="range"
+                        selected={{ from: dateRange.from, to: dateRange.to }}
+                        onSelect={(range) => {
+                          if (range) {
+                            handleDateRangeSelect({ from: range.from, to: range.to })
+                          }
+                        }}
+                        numberOfMonths={1}
+                        className="bg-white dark:bg-gray-800 admin-panel compact-calendar"
+                      />
+                      {(dateRange.from || dateRange.to) && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => setDateRange({ from: undefined, to: undefined })}
+                          className="w-full admin-panel text-xs h-7"
+                        >
+                          Clear Date Range
+                        </Button>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            {/* Active Filters Section - Always Reserved Space */}
+            <div className="min-h-[2.5rem] flex items-center">
+              {hasActiveFilters ? (
+                <div className="flex items-center gap-2 flex-wrap w-full">
+                  <span className="text-sm text-gray-600 dark:text-gray-400 font-medium flex-shrink-0">Active filters:</span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {searchQuery && (
+                      <Badge 
+                        variant="secondary" 
+                        className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700 admin-panel admin-font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors cursor-pointer group"
+                        onClick={() => setSearchQuery('')}
+                      >
+                        <span className="text-xs">Search: {searchQuery}</span>
+                        <X className="ml-1 h-3 w-3 group-hover:text-blue-900 dark:group-hover:text-blue-100 transition-colors" />
+                      </Badge>
+                    )}
+                    {selectedCategories.map(categoryId => {
+                      const category = mockCategories.find(c => c.id === categoryId)
+                      return (
+                        <Badge 
+                          key={categoryId} 
+                          variant="secondary" 
+                          className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-700 admin-panel admin-font-medium hover:bg-green-200 dark:hover:bg-green-800 transition-colors cursor-pointer group"
+                          onClick={() => handleCategoryToggle(categoryId)}
+                        >
+                          <span className="text-xs">{category?.name}</span>
+                          <X className="ml-1 h-3 w-3 group-hover:text-green-900 dark:group-hover:text-green-100 transition-colors" />
+                        </Badge>
+                      )
+                    })}
+                    {(dateRange.from || dateRange.to) && (
+                      <Badge 
+                        variant="secondary" 
+                        className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-700 admin-panel admin-font-medium hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors cursor-pointer group"
+                        onClick={() => setDateRange({ from: undefined, to: undefined })}
+                      >
+                        <span className="text-xs">
+                          Date: {dateRange.from ? format(dateRange.from, 'MMM dd') : '...'} - {dateRange.to ? format(dateRange.to, 'MMM dd') : '...'}
+                        </span>
+                        <X className="ml-1 h-3 w-3 group-hover:text-purple-900 dark:group-hover:text-purple-100 transition-colors" />
+                      </Badge>
+                    )}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={clearFilters} 
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 admin-panel font-medium text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0 ml-auto"
+                  >
+                    Clear all
+                  </Button>
+                </div>
+              ) : (
+                <div className="w-full h-10 flex items-center">
+                  <span className="text-sm text-gray-400 dark:text-gray-500 font-normal italic">No active filters</span>
+                </div>
+              )}
+            </div>
+          </div>
+
           <Table>
             <TableHeader>
-              {/* Integrated Search and Filter Row */}
-              <TableRow className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600">
-                <TableHead colSpan={5} className="py-4 px-6">
-                  <div className="flex items-center justify-between gap-4">
-                    {/* Search on the left */}
-                    <div className="relative flex-1 max-w-md">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
-                      <Input
-                        placeholder="Search news articles..."
-                        value={searchQuery}
-                        onChange={(e) => {
-                          setSearchQuery(e.target.value)
-                          setCurrentPage(1)
-                        }}
-                        className="pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                      />
-                    </div>
-                    
-                    {/* Filters on the right */}
-                    <div className="flex items-center gap-2">
-                      {/* Category Filter */}
-                      <Popover open={isCategoryFilterOpen} onOpenChange={setIsCategoryFilterOpen}>
-                        <PopoverTrigger asChild>
-                          <Button 
-                            variant="outline" 
-                            className={`border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 ${selectedCategories.length > 0 ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-600' : ''}`}
-                          >
-                            <Filter className="h-4 w-4 mr-2" />
-                            Categories
-                            {selectedCategories.length > 0 && (
-                              <Badge className="ml-2 h-5 w-5 p-0 text-xs bg-blue-600 text-white">
-                                {selectedCategories.length}
-                              </Badge>
-                            )}
-                            <ChevronDown className="h-4 w-4 ml-1" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg" align="end">
-                          <div className="space-y-4">
-                            <h4 className="font-medium text-gray-900 dark:text-white">Filter by Category</h4>
-                            <div className="space-y-2">
-                              {mockCategories.map((category) => (
-                                <div key={category.id} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={category.id}
-                                    checked={selectedCategories.includes(category.id)}
-                                    onCheckedChange={() => handleCategoryToggle(category.id)}
-                                  />
-                                  <Label 
-                                    htmlFor={category.id}
-                                    className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
-                                  >
-                                    {category.name}
-                                  </Label>
-                                </div>
-                              ))}
-                            </div>
-                            {selectedCategories.length > 0 && (
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => setSelectedCategories([])}
-                                className="w-full"
-                              >
-                                Clear Categories
-                              </Button>
-                            )}
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-
-                      {/* Date Filter */}
-                      <Popover open={isDateFilterOpen} onOpenChange={setIsDateFilterOpen}>
-                        <PopoverTrigger asChild>
-                          <Button 
-                            variant="outline"
-                            className={`border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 ${(dateRange.from || dateRange.to) ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-300 dark:border-purple-600' : ''}`}
-                          >
-                            <CalendarIcon className="h-4 w-4 mr-2" />
-                            Date Range
-                            <ChevronDown className="h-4 w-4 ml-1" />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg" align="end">
-                          <div className="p-4 space-y-4">
-                            <h4 className="font-medium text-gray-900 dark:text-white">Select Date Range</h4>
-                            <Calendar
-                              mode="range"
-                              selected={{ from: dateRange.from, to: dateRange.to }}
-                              onSelect={(range) => {
-                                if (range) {
-                                  handleDateRangeSelect({ from: range.from, to: range.to })
-                                }
-                              }}
-                              numberOfMonths={1}
-                              className="bg-white dark:bg-gray-800"
-                            />
-                            {(dateRange.from || dateRange.to) && (
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => setDateRange({ from: undefined, to: undefined })}
-                                className="w-full"
-                              >
-                                Clear Date Range
-                              </Button>
-                            )}
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                  </div>
-                </TableHead>
-              </TableRow>
-              
-              {/* Column Headers */}
               <TableRow className="bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-200 dark:border-gray-600">
                 <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-6">Title</TableHead>
                 <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Published Date</TableHead>
