@@ -461,34 +461,59 @@
   align-items: center;
   justify-content: center;
   position: relative;
-  border-radius: 0;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: center;
+  line-height: 1;
+  text-decoration: none;
+  outline: none;
+  box-sizing: border-box;
+  min-width: 2rem;
+  min-height: 2rem;
 }
 
 /* Enhanced Date Range Selection Styling - Based on Example */
 .compact-calendar .rdp-range_start {
   background-color: #4f46e5 !important; /* indigo-600 - solid for start */
   color: white !important;
-  border-radius: 50%;
+  border-radius: 50% !important;
   font-weight: 600;
   position: relative;
   z-index: 10;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .compact-calendar .rdp-range_end {
   background-color: #4f46e5 !important; /* indigo-600 - solid for end */
   color: white !important;
-  border-radius: 50%;
+  border-radius: 50% !important;
   font-weight: 600;
   position: relative;
   z-index: 10;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .compact-calendar .rdp-range_middle {
   background-color: #c7d2fe !important; /* indigo-200 - light for range */
   color: #3730a3 !important; /* indigo-800 */
-  border-radius: 0;
+  border-radius: 0 !important;
   font-weight: 500;
   position: relative;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .dark .compact-calendar .rdp-range_middle {
@@ -500,16 +525,26 @@
 .compact-calendar .rdp-range_start.rdp-range_end {
   background-color: #4f46e5 !important;
   color: white !important;
-  border-radius: 50%;
+  border-radius: 50% !important;
   font-weight: 600;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* General selected state for non-range selection */
 .compact-calendar .rdp-selected:not(.rdp-range_start):not(.rdp-range_end):not(.rdp-range_middle) {
   background-color: #4f46e5 !important;
   color: white !important;
-  border-radius: 50%;
+  border-radius: 50% !important;
   font-weight: 600;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* Range connection styling using button positioning */
@@ -569,13 +604,18 @@
 .compact-calendar button:hover:not(.rdp-selected):not(.rdp-range_start):not(.rdp-range_end):not(.rdp-range_middle) {
   background-color: #f1f5f9 !important; /* slate-100 */
   color: #475569 !important; /* slate-600 */
-  border-radius: 50%;
+  border-radius: 50% !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .dark .compact-calendar button:hover:not(.rdp-selected):not(.rdp-range_start):not(.rdp-range_end):not(.rdp-range_middle) {
   background-color: #475569 !important; /* slate-600 */
   color: #f1f5f9 !important; /* slate-100 */
-  border-radius: 50%;
+  border-radius: 50% !important;
 }
 
 /* Hover effect on range days */
@@ -600,7 +640,12 @@
   color: #4f46e5 !important; /* indigo-600 */
   font-weight: 600;
   border: 2px solid #4f46e5;
-  border-radius: 50%;
+  border-radius: 50% !important;
+  width: 2rem !important;
+  height: 2rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .dark .compact-calendar .rdp-today:not(.rdp-selected):not(.rdp-range_start):not(.rdp-range_end):not(.rdp-range_middle) {
