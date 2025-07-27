@@ -403,7 +403,7 @@ export function NewsTable() {
                           }
                         }}
                         numberOfMonths={1}
-                        className="bg-white dark:bg-gray-800 admin-panel compact-calendar"
+                        className="bg-white dark:bg-gray-800 admin-panel"
                       />
                       {(dateRange.from || dateRange.to) && (
                         <Button 
