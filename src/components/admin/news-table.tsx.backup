@@ -8,6 +8,24 @@ import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Calendar } from '@/components/ui/calendar'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   Table,
   TableBody,
   TableCell,
@@ -37,24 +55,6 @@ import {
 } from '@/components/ui/popover'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
 import { 
   Plus, 
   Search, 
@@ -639,7 +639,7 @@ export function NewsTable() {
               
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Excerpt</h3>
-                <p className="text-gray-700 dark:text-gray-300">{selectedArticle.excerpt || 'No excerpt available.'}</p>
+                <p className="text-gray-700 dark:text-gray-300">{selectedArticle.excerpt || &apos;No excerpt available.&apos;}</p>
               </div>
               
               <div>
@@ -706,7 +706,7 @@ export function NewsTable() {
               Edit Article
             </DialogTitle>
             <DialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
-              Make changes to the article. Click save when you are done.
+              Make changes to the article. Click save when you&apos;re done.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 admin-panel">
@@ -795,7 +795,7 @@ export function NewsTable() {
               Delete Article
             </AlertDialogTitle>
             <AlertDialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
-              Are you sure you want to delete this article? This action cannot be undone.
+              Are you sure you want to delete &quot;{selectedArticle?.title}&quot;? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">
