@@ -414,7 +414,7 @@
   padding: 0.75rem;
 }
 
-/* Range highlighting for new calendar */
+/* Range highlighting for new calendar - Only start and end dates */
 .admin-panel [data-range-start="true"] {
   background-color: #4f46e5 !important; /* indigo-600 */
   color: white !important;
@@ -429,63 +429,12 @@
   font-weight: 600;
 }
 
-.admin-panel [data-range-middle="true"] {
-  background-color: #c7d2fe !important; /* indigo-200 */
-  color: #3730a3 !important; /* indigo-800 */
-  border-radius: 0 !important;
-  font-weight: 500;
-}
-
-.dark .admin-panel [data-range-middle="true"] {
-  background-color: #3730a3 !important; /* indigo-800 */
-  color: #e0e7ff !important; /* indigo-100 */
-}
-
 /* Single selection styling */
 .admin-panel [data-selected-single="true"] {
   background-color: #4f46e5 !important;
   color: white !important;
   border-radius: 50% !important;
   font-weight: 600;
-}
-
-/* Better range connection styling */
-.admin-panel [data-range-start="true"]::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: -50%;
-  width: 50%;
-  height: 100%;
-  background-color: #c7d2fe;
-  z-index: -1;
-  border-radius: 0;
-}
-
-.dark .admin-panel [data-range-start="true"]::after {
-  background-color: #3730a3;
-}
-
-.admin-panel [data-range-end="true"]::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -50%;
-  width: 50%;
-  height: 100%;
-  background-color: #c7d2fe;
-  z-index: -1;
-  border-radius: 0;
-}
-
-.dark .admin-panel [data-range-end="true"]::before {
-  background-color: #3730a3;
-}
-
-/* Hide connectors when start and end are the same */
-.admin-panel [data-selected-single="true"]::after,
-.admin-panel [data-selected-single="true"]::before {
-  display: none;
 }
 
 /* Today indicator */
