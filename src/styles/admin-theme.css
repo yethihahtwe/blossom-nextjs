@@ -406,7 +406,103 @@
   border-color: var(--admin-border-primary);
 }
 
-/* Compact Calendar Styling */
+/* Modern Calendar Styling for Upgraded Component */
+.admin-panel .calendar,
+.admin-panel [data-slot="calendar"] {
+  --cell-size: 2rem; /* 32px cells */
+  font-size: 0.875rem;
+  padding: 0.75rem;
+}
+
+/* Range highlighting for new calendar */
+.admin-panel [data-range-start="true"] {
+  background-color: #4f46e5 !important; /* indigo-600 */
+  color: white !important;
+  border-radius: 50% !important;
+  font-weight: 600;
+}
+
+.admin-panel [data-range-end="true"] {
+  background-color: #4f46e5 !important; /* indigo-600 */
+  color: white !important;
+  border-radius: 50% !important;
+  font-weight: 600;
+}
+
+.admin-panel [data-range-middle="true"] {
+  background-color: #c7d2fe !important; /* indigo-200 */
+  color: #3730a3 !important; /* indigo-800 */
+  border-radius: 0 !important;
+  font-weight: 500;
+}
+
+.dark .admin-panel [data-range-middle="true"] {
+  background-color: #3730a3 !important; /* indigo-800 */
+  color: #e0e7ff !important; /* indigo-100 */
+}
+
+/* Single selection styling */
+.admin-panel [data-selected-single="true"] {
+  background-color: #4f46e5 !important;
+  color: white !important;
+  border-radius: 50% !important;
+  font-weight: 600;
+}
+
+/* Better range connection styling */
+.admin-panel [data-range-start="true"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -50%;
+  width: 50%;
+  height: 100%;
+  background-color: #c7d2fe;
+  z-index: -1;
+  border-radius: 0;
+}
+
+.dark .admin-panel [data-range-start="true"]::after {
+  background-color: #3730a3;
+}
+
+.admin-panel [data-range-end="true"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 50%;
+  height: 100%;
+  background-color: #c7d2fe;
+  z-index: -1;
+  border-radius: 0;
+}
+
+.dark .admin-panel [data-range-end="true"]::before {
+  background-color: #3730a3;
+}
+
+/* Hide connectors when start and end are the same */
+.admin-panel [data-selected-single="true"]::after,
+.admin-panel [data-selected-single="true"]::before {
+  display: none;
+}
+
+/* Today indicator */
+.admin-panel .calendar button[data-today="true"]:not([data-selected-single="true"]):not([data-range-start="true"]):not([data-range-end="true"]):not([data-range-middle="true"]) {
+  background-color: transparent !important;
+  color: #4f46e5 !important;
+  font-weight: 600;
+  border: 2px solid #4f46e5;
+  border-radius: 50% !important;
+}
+
+.dark .admin-panel .calendar button[data-today="true"]:not([data-selected-single="true"]):not([data-range-start="true"]):not([data-range-end="true"]):not([data-range-middle="true"]) {
+  color: #818cf8 !important;
+  border-color: #818cf8;
+}
+
+/* Compact Calendar Styling (legacy - keeping for compatibility) */
 .compact-calendar {
   font-size: 0.875rem; /* 14px - smaller base font */
   padding: 0.5rem; /* Reduced padding */
