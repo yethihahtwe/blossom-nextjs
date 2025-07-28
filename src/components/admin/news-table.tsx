@@ -621,7 +621,7 @@ export function NewsTable() {
 
       {/* View Modal */}
       <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
+        <DialogContent className="max-w-6xl max-h-[85vh] overflow-y-auto bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white admin-panel">
               View Article
