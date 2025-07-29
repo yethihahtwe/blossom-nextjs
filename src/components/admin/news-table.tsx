@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/popover'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { Editor } from '@/components/ui/editor'
 import {
   Dialog,
   DialogContent,
@@ -644,9 +645,10 @@ export function NewsTable() {
               
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Content</h3>
-                <div className="prose dark:prose-invert max-w-none">
-                  <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{selectedArticle.content}</p>
-                </div>
+                <div 
+                  className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"
+                  dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
+                />
               </div>
               
               <div className="grid grid-cols-2 gap-4">
@@ -700,7 +702,7 @@ export function NewsTable() {
 
       {/* Edit Modal */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
+        <DialogContent className="max-w-7xl w-[90vw] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white admin-panel">
               Edit Article
@@ -738,17 +740,17 @@ export function NewsTable() {
             </div>
             
             <div>
-              <Label htmlFor="edit-content" className="text-sm font-medium text-gray-900 dark:text-white">
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
                 Content
               </Label>
-              <Textarea
-                id="edit-content"
-                value={editForm.content}
-                onChange={(e) => setEditForm(prev => ({ ...prev, content: e.target.value }))}
-                className="mt-1 admin-panel"
-                placeholder="Enter article content..."
-                rows={10}
-              />
+              <div className="mt-1">
+                <Editor
+                  content={editForm.content}
+                  onChange={(content) => setEditForm(prev => ({ ...prev, content }))}
+                  placeholder="Enter article content..."
+                  className="admin-panel"
+                />
+              </div>
             </div>
             
             <div>
@@ -759,7 +761,7 @@ export function NewsTable() {
                 id="edit-status"
                 value={editForm.status}
                 onChange={(e) => setEditForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' | 'archived' }))}
-                className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel"
+                className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
