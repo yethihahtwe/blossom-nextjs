@@ -283,8 +283,18 @@ export function NewsTable() {
     
     setIsSaving(true)
     try {
-      // Create the news article in the database
-      const newNews = await createNews(createForm)
+      // Create the news article in the database with all required fields
+      const newsData = {
+        title: createForm.title,
+        content: createForm.content,
+        excerpt: createForm.excerpt,
+        category: createForm.category,
+        status: createForm.status,
+        featured_image: undefined,
+        author: undefined,
+        reading_time: undefined
+      }
+      const newNews = await createNews(newsData)
       
       if (newNews) {
         // Add to local state
@@ -295,11 +305,11 @@ export function NewsTable() {
           title: '',
           content: '',
           excerpt: '',
-          category: 'General',
+          category: categories.length > 0 ? categories[0].name : '',
           status: 'draft'
         })
       } else {
-        console.error('Failed to create article')
+        console.error('Failed to create article - createNews returned null')
       }
     } catch (error) {
       console.error('Error creating article:', error)
@@ -555,6 +565,7 @@ export function NewsTable() {
             <TableHeader>
               <TableRow className="bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-200 dark:border-gray-600">
                 <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-6">Title</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Category</TableHead>
                 <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Published Date</TableHead>
                 <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Status</TableHead>
                 <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Views</TableHead>
@@ -573,6 +584,14 @@ export function NewsTable() {
                         {article.excerpt}
                       </p>
                     </div>
+                  </TableCell>
+                  <TableCell className="py-4 px-4">
+                    <Badge 
+                      variant="outline" 
+                      className="bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700"
+                    >
+                      {article.category}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-gray-600 dark:text-gray-300 py-4 px-4">
                     {formatDate(article.published_at)}
@@ -822,38 +841,40 @@ export function NewsTable() {
               </div>
             </div>
             
-            <div>
-              <Label htmlFor="edit-category" className="text-sm font-medium text-gray-900 dark:text-white">
-                Category
-              </Label>
-              <select
-                id="edit-category"
-                value={editForm.category}
-                onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value }))}
-                className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
-              >
-                {categories.map((category) => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <Label htmlFor="edit-status" className="text-sm font-medium text-gray-900 dark:text-white">
-                Status
-              </Label>
-              <select
-                id="edit-status"
-                value={editForm.status}
-                onChange={(e) => setEditForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' | 'archived' }))}
-                className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
-              >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-                <option value="archived">Archived</option>
-              </select>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-category" className="text-sm font-medium text-gray-900 dark:text-white">
+                  Category
+                </Label>
+                <select
+                  id="edit-category"
+                  value={editForm.category}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value }))}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+                >
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-status" className="text-sm font-medium text-gray-900 dark:text-white">
+                  Status
+                </Label>
+                <select
+                  id="edit-status"
+                  value={editForm.status}
+                  onChange={(e) => setEditForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' | 'archived' }))}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                  <option value="archived">Archived</option>
+                </select>
+              </div>
             </div>
           </div>
           <DialogFooter className="gap-2">
@@ -939,37 +960,39 @@ export function NewsTable() {
               </div>
             </div>
             
-            <div>
-              <Label htmlFor="create-category" className="text-sm font-medium text-gray-900 dark:text-white">
-                Category
-              </Label>
-              <select
-                id="create-category"
-                value={createForm.category}
-                onChange={(e) => setCreateForm(prev => ({ ...prev, category: e.target.value }))}
-                className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
-              >
-                {categories.map((category) => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            
-            <div>
-              <Label htmlFor="create-status" className="text-sm font-medium text-gray-900 dark:text-white">
-                Status
-              </Label>
-              <select
-                id="create-status"
-                value={createForm.status}
-                onChange={(e) => setCreateForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' }))}
-                className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
-              >
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-              </select>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="create-category" className="text-sm font-medium text-gray-900 dark:text-white">
+                  Category
+                </Label>
+                <select
+                  id="create-category"
+                  value={createForm.category}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, category: e.target.value }))}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+                >
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <Label htmlFor="create-status" className="text-sm font-medium text-gray-900 dark:text-white">
+                  Status
+                </Label>
+                <select
+                  id="create-status"
+                  value={createForm.status}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' }))}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
             </div>
           </div>
           <DialogFooter className="gap-2">
