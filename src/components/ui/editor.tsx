@@ -43,6 +43,7 @@ interface EditorProps {
 
 export function Editor({ content, onChange, placeholder = 'Start writing...', className }: EditorProps) {
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       Link.configure({

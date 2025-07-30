@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getNewsBySlug, getPublishedNews } from '@/data/mockNews';
+import { getNewsBySlug, getPublishedNews } from '@/lib/news';
 import { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -13,7 +13,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const news = getNewsBySlug(slug);
+  const news = await getNewsBySlug(slug);
 
   if (!news) {
     return {
@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export async function generateStaticParams() {
-  const news = getPublishedNews();
+  const news = await getPublishedNews();
   return news.map((article) => ({
     slug: article.slug,
   }));
@@ -50,7 +50,7 @@ export async function generateStaticParams() {
 
 export default async function NewsArticlePage({ params }: PageProps) {
   const { slug } = await params;
-  const news = getNewsBySlug(slug);
+  const news = await getNewsBySlug(slug);
 
   if (!news || news.status !== 'published') {
     notFound();
@@ -64,7 +64,8 @@ export default async function NewsArticlePage({ params }: PageProps) {
     });
   };
 
-  const relatedNews = getPublishedNews()
+  const allNews = await getPublishedNews();
+  const relatedNews = allNews
     .filter(article => article.id !== news.id && article.category === news.category)
     .slice(0, 3);
 
