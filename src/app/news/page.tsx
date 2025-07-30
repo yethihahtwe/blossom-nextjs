@@ -7,6 +7,7 @@ import NewsCard from '@/components/NewsCard';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 6;
 
@@ -147,47 +148,89 @@ export default function NewsPage() {
           <div className="mb-8 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
             <div className="w-full">
               <div className="flex flex-wrap gap-2 justify-start">
-                <button
-                  onClick={() => handleCategoryChange('')}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    selectedCategory === '' 
-                      ? 'bg-red-600 text-white shadow-md' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                  }`}
-                >
-                  All Categories
-                </button>
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryChange(category)}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                      selectedCategory === category 
-                        ? 'bg-red-600 text-white shadow-md' 
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
+                {loading ? (
+                  <>
+                    <Skeleton className="h-9 w-28 rounded-lg" />
+                    <Skeleton className="h-9 w-24 rounded-lg" />
+                    <Skeleton className="h-9 w-32 rounded-lg" />
+                    <Skeleton className="h-9 w-28 rounded-lg" />
+                    <Skeleton className="h-9 w-20 rounded-lg" />
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handleCategoryChange('')}
+                      className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                        selectedCategory === '' 
+                          ? 'bg-red-600 text-white shadow-md' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+                      }`}
+                    >
+                      All Categories
+                    </button>
+                    {categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => handleCategoryChange(category)}
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                          selectedCategory === category 
+                            ? 'bg-red-600 text-white shadow-md' 
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
           </div>
 
           {/* Results Info */}
           <div className="mb-6">
-            <p className="text-gray-600">
-              {filteredNews.length === 0 
-                ? 'No news found matching your criteria.' 
-                : `Showing ${Math.min(ITEMS_PER_PAGE, filteredNews.length - (currentPage - 1) * ITEMS_PER_PAGE)} of ${filteredNews.length} articles`
-              }
-            </p>
+            {loading ? (
+              <Skeleton className="h-5 w-48" />
+            ) : (
+              <p className="text-gray-600">
+                {filteredNews.length === 0 
+                  ? 'No news found matching your criteria.' 
+                  : `Showing ${Math.min(ITEMS_PER_PAGE, filteredNews.length - (currentPage - 1) * ITEMS_PER_PAGE)} of ${filteredNews.length} articles`
+                }
+              </p>
+            )}
           </div>
 
           {/* News Grid */}
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">Loading news articles...</p>
+            <div className="news-grid">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="news-card-article">
+                  {/* Image skeleton */}
+                  <Skeleton className="news-image-container" />
+                  
+                  {/* Content skeleton */}
+                  <div className="news-content-container">
+                    {/* Date skeleton */}
+                    <Skeleton className="h-4 w-24 mb-3" />
+                    
+                    {/* Title skeleton */}
+                    <Skeleton className="h-6 w-full mb-2" />
+                    <Skeleton className="h-6 w-3/4 mb-3" />
+                    
+                    {/* Excerpt skeleton */}
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-2/3 mb-4" />
+                    
+                    {/* Category and reading time skeleton */}
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                      <Skeleton className="h-4 w-16" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : currentNews.length > 0 ? (
             <div className="news-grid">

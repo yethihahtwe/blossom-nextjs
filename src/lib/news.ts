@@ -118,3 +118,25 @@ export async function getRecentNews(limit: number = 3): Promise<News[]> {
 
   return data || []
 }
+
+/**
+ * Update an existing news article
+ */
+export async function updateNews(id: string, updates: Partial<News>): Promise<News | null> {
+  const { data, error } = await supabase
+    .from('news')
+    .update({
+      ...updates,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error updating news:', error)
+    return null
+  }
+
+  return data
+}

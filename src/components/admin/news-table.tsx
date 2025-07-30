@@ -70,7 +70,7 @@ import {
   ChevronDown,
   AlertTriangle
 } from 'lucide-react'
-import { getPublishedNews, type News } from '@/lib/news'
+import { getPublishedNews, updateNews, type News } from '@/lib/news'
 import { format } from 'date-fns'
 
 const ITEMS_PER_PAGE = 10
@@ -226,17 +226,20 @@ export function NewsTable() {
     if (!selectedArticle) return
     
     try {
-      // TODO: Implement actual update API call
-      // await updateNews(selectedArticle.id, editForm)
+      // Update the news article in the database
+      const updatedNews = await updateNews(selectedArticle.id, editForm)
       
-      // For now, update local state
-      setNews(prev => prev.map(item => 
-        item.id === selectedArticle.id 
-          ? { ...item, ...editForm, updated_at: new Date().toISOString() }
-          : item
-      ))
-      setEditModalOpen(false)
-      setSelectedArticle(null)
+      if (updatedNews) {
+        // Update local state with the updated article
+        setNews(prev => prev.map(item => 
+          item.id === selectedArticle.id ? updatedNews : item
+        ))
+        
+        setEditModalOpen(false)
+        setSelectedArticle(null)
+      } else {
+        console.error('Failed to update article')
+      }
     } catch (error) {
       console.error('Error updating article:', error)
     }
