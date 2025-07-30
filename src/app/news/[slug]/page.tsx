@@ -6,6 +6,7 @@ import { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import ScrollToTopOnMount from '@/components/ScrollToTopOnMount';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -71,6 +72,7 @@ export default async function NewsArticlePage({ params }: PageProps) {
 
   return (
     <div className="min-h-screen">
+      <ScrollToTopOnMount />
       <Header />
       <div className="min-h-screen bg-gray-50">
       {/* Breadcrumb */}

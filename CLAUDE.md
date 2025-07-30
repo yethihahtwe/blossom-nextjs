@@ -70,3 +70,22 @@
 ## Database Models
 1. **News**: title, slug, content, featured_image, excerpt, published_at, status
 2. **Announcement**: title, slug, content, featured_image, excerpt, priority (normal/important/urgent), published_at, status
+
+## WYSIWYG Editor Implementation
+- ✅ TipTap WYSIWYG editor integrated for news content editing
+- ✅ Rich text formatting (bold, italic, headings, lists, links, images, alignment)
+- ✅ Database persistence fixed - updateNews function implemented in src/lib/news.ts
+- ✅ Frontend rendering with dangerouslySetInnerHTML and Tailwind prose classes
+- ✅ @tailwindcss/typography plugin installed and configured
+- ✅ Enhanced prose styles in globals.css for proper rich text display
+
+## Loading States and UX Improvements
+- ✅ Shimmer loading effects added to frontend news page (src/app/news/page.tsx)  
+- ✅ Navigation loading pages created:
+  - src/app/news/loading.tsx (news page loading)
+  - src/app/news/[slug]/loading.tsx (individual article loading)
+- ✅ Skeleton components with proper structure matching actual content
+- ✅ Professional loading experience during page navigation
+
+## Coding Guidelines
+- Do not explain what you have done in the chat response
