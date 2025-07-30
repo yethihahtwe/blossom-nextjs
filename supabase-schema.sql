@@ -181,5 +181,39 @@ CREATE POLICY "Allow public read access to published news" ON news
 CREATE POLICY "Allow public read access to published announcements" ON announcements
   FOR SELECT USING (status = 'published');
 
+-- Categories Table
+CREATE TABLE IF NOT EXISTS categories (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  name VARCHAR(100) UNIQUE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes for categories
+CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name);
+
+-- Create trigger to automatically update updated_at for categories
+CREATE TRIGGER update_categories_updated_at 
+  BEFORE UPDATE ON categories 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Insert default categories
+INSERT INTO categories (name) VALUES
+('School Events'),
+('Academic Events'),
+('Facilities'),
+('Cultural Events'),
+('Programs'),
+('Academic Programs'),
+('General')
+ON CONFLICT (name) DO NOTHING;
+
+-- Set up Row Level Security for categories
+ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access to categories
+CREATE POLICY "Allow public read access to categories" ON categories
+  FOR SELECT USING (true);
+
 -- Note: For admin operations (create, update, delete), you'll need to set up authentication
 -- and create appropriate policies for authenticated users with admin roles

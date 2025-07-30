@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { getCategories, type Category } from '@/lib/categories'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -76,14 +77,6 @@ import { format } from 'date-fns'
 
 const ITEMS_PER_PAGE = 10
 
-// Mock categories - replace with actual API call
-const mockCategories = [
-  { id: '1', name: 'School Events' },
-  { id: '2', name: 'Academic News' },
-  { id: '3', name: 'Sports & Activities' },
-  { id: '4', name: 'Announcements' },
-  { id: '5', name: 'Alumni News' }
-]
 
 type DateRange = {
   from: Date | undefined
@@ -92,6 +85,7 @@ type DateRange = {
 
 export function NewsTable() {
   const [news, setNews] = useState<News[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -113,6 +107,7 @@ export function NewsTable() {
     title: '',
     content: '',
     excerpt: '',
+    category: '',
     status: 'draft' as 'draft' | 'published' | 'archived'
   })
 
@@ -121,23 +116,34 @@ export function NewsTable() {
     title: '',
     content: '',
     excerpt: '',
-    category: 'General',
+    category: '',
     status: 'draft' as 'draft' | 'published'
   })
 
+  // Set default category when categories are loaded
   useEffect(() => {
-    async function fetchNews() {
+    if (categories.length > 0 && !createForm.category) {
+      setCreateForm(prev => ({ ...prev, category: categories[0].name }))
+    }
+  }, [categories, createForm.category])
+
+  useEffect(() => {
+    async function fetchData() {
       try {
-        const data = await getPublishedNews()
-        setNews(data)
+        const [newsData, categoriesData] = await Promise.all([
+          getPublishedNews(),
+          getCategories()
+        ])
+        setNews(newsData)
+        setCategories(categoriesData)
       } catch (error) {
-        console.error('Error fetching news:', error)
+        console.error('Error fetching data:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchNews()
+    fetchData()
   }, [])
 
   // Advanced filtering logic
@@ -147,12 +153,11 @@ export function NewsTable() {
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.content.toLowerCase().includes(searchQuery.toLowerCase())
     
-    // Category filter (mock implementation - in real app, you'd have article.category)
+    // Category filter
     const matchesCategory = selectedCategories.length === 0 || 
       selectedCategories.some(categoryId => {
-        // Mock: randomly assign categories for demo
-        const mockCategoryId = (parseInt(article.id) % mockCategories.length + 1).toString()
-        return categoryId === mockCategoryId
+        const category = categories.find(c => c.id === categoryId)
+        return category && article.category === category.name
       })
     
     // Date range filter
@@ -208,6 +213,7 @@ export function NewsTable() {
       title: article.title,
       content: article.content,
       excerpt: article.excerpt || '',
+      category: article.category,
       status: article.status as 'draft' | 'published' | 'archived'
     })
     setEditModalOpen(true)
@@ -413,7 +419,7 @@ export function NewsTable() {
                     <div className="space-y-4">
                       <h4 className="admin-font-medium text-gray-900 dark:text-white admin-text-base">Filter by Category</h4>
                       <div className="space-y-2">
-                        {mockCategories.map((category) => (
+                        {categories.map((category) => (
                           <div key={category.id} className="flex items-center space-x-2">
                             <Checkbox
                               id={category.id}
@@ -502,7 +508,7 @@ export function NewsTable() {
                       </Badge>
                     )}
                     {selectedCategories.map(categoryId => {
-                      const category = mockCategories.find(c => c.id === categoryId)
+                      const category = categories.find(c => c.id === categoryId)
                       return (
                         <Badge 
                           key={categoryId} 
@@ -817,6 +823,24 @@ export function NewsTable() {
             </div>
             
             <div>
+              <Label htmlFor="edit-category" className="text-sm font-medium text-gray-900 dark:text-white">
+                Category
+              </Label>
+              <select
+                id="edit-category"
+                value={editForm.category}
+                onChange={(e) => setEditForm(prev => ({ ...prev, category: e.target.value }))}
+                className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+              >
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
               <Label htmlFor="edit-status" className="text-sm font-medium text-gray-900 dark:text-white">
                 Status
               </Label>
@@ -925,13 +949,11 @@ export function NewsTable() {
                 onChange={(e) => setCreateForm(prev => ({ ...prev, category: e.target.value }))}
                 className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
               >
-                <option value="General">General</option>
-                <option value="Academic Events">Academic Events</option>
-                <option value="School Events">School Events</option>
-                <option value="Cultural Events">Cultural Events</option>
-                <option value="Academic Programs">Academic Programs</option>
-                <option value="Programs">Programs</option>
-                <option value="Facilities">Facilities</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name}
+                  </option>
+                ))}
               </select>
             </div>
             

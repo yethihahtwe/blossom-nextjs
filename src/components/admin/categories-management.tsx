@@ -30,44 +30,29 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Label } from '@/components/ui/label'
 import { Plus, Edit, Trash2, MoreHorizontal, Tag } from 'lucide-react'
-
-interface Category {
-  id: string
-  name: string
-  created_at: string
-  updated_at: string
-}
-
-// Mock data - replace with actual API calls
-const mockCategories: Category[] = [
-  {
-    id: '1',
-    name: 'School Events',
-    created_at: '2024-01-15T10:30:00Z',
-    updated_at: '2024-01-15T10:30:00Z'
-  },
-  {
-    id: '2',
-    name: 'Academic News',
-    created_at: '2024-01-20T14:15:00Z',
-    updated_at: '2024-02-01T09:20:00Z'
-  },
-  {
-    id: '3',
-    name: 'Sports & Activities',
-    created_at: '2024-02-10T16:45:00Z',
-    updated_at: '2024-02-10T16:45:00Z'
-  }
-]
+import { getCategories, createCategory, updateCategory, deleteCategory, type Category } from '@/lib/categories'
 
 export function CategoriesManagement() {
-  const [categories, setCategories] = useState<Category[]>(mockCategories)
-  const [loading, setLoading] = useState(false)
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(true)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [formData, setFormData] = useState({ name: '' })
+  const [isSaving, setIsSaving] = useState(false)
+
+  // Load categories on component mount
+  useEffect(() => {
+    loadCategories()
+  }, [])
+
+  const loadCategories = async () => {
+    setLoading(true)
+    const data = await getCategories()
+    setCategories(data)
+    setLoading(false)
+  }
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -79,40 +64,46 @@ export function CategoriesManagement() {
     })
   }
 
-  const handleCreate = () => {
-    if (!formData.name.trim()) return
+  const handleCreate = async () => {
+    if (!formData.name.trim() || isSaving) return
 
-    const newCategory: Category = {
-      id: Date.now().toString(),
-      name: formData.name.trim(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+    setIsSaving(true)
+    const newCategory = await createCategory(formData.name)
+    if (newCategory) {
+      setCategories(prev => [...prev, newCategory])
+      setFormData({ name: '' })
+      setIsCreateOpen(false)
     }
-
-    setCategories(prev => [...prev, newCategory])
-    setFormData({ name: '' })
-    setIsCreateOpen(false)
+    setIsSaving(false)
   }
 
-  const handleEdit = () => {
-    if (!selectedCategory || !formData.name.trim()) return
+  const handleEdit = async () => {
+    if (!selectedCategory || !formData.name.trim() || isSaving) return
 
-    setCategories(prev => prev.map(cat => 
-      cat.id === selectedCategory.id 
-        ? { ...cat, name: formData.name.trim(), updated_at: new Date().toISOString() }
-        : cat
-    ))
-    setFormData({ name: '' })
-    setSelectedCategory(null)
-    setIsEditOpen(false)
+    setIsSaving(true)
+    const updatedCategory = await updateCategory(selectedCategory.id, formData.name)
+    if (updatedCategory) {
+      setCategories(prev => prev.map(cat => 
+        cat.id === selectedCategory.id ? updatedCategory : cat
+      ))
+      setFormData({ name: '' })
+      setSelectedCategory(null)
+      setIsEditOpen(false)
+    }
+    setIsSaving(false)
   }
 
-  const handleDelete = () => {
-    if (!selectedCategory) return
+  const handleDelete = async () => {
+    if (!selectedCategory || isSaving) return
 
-    setCategories(prev => prev.filter(cat => cat.id !== selectedCategory.id))
-    setSelectedCategory(null)
-    setIsDeleteOpen(false)
+    setIsSaving(true)
+    const success = await deleteCategory(selectedCategory.id)
+    if (success) {
+      setCategories(prev => prev.filter(cat => cat.id !== selectedCategory.id))
+      setSelectedCategory(null)
+      setIsDeleteOpen(false)
+    }
+    setIsSaving(false)
   }
 
   const openEditDialog = (category: Category) => {
@@ -172,8 +163,8 @@ export function CategoriesManagement() {
               >
                 Cancel
               </Button>
-              <Button onClick={handleCreate} disabled={!formData.name.trim()}>
-                Create Category
+              <Button onClick={handleCreate} disabled={!formData.name.trim() || isSaving}>
+                {isSaving ? 'Creating...' : 'Create Category'}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -183,17 +174,23 @@ export function CategoriesManagement() {
       {/* Categories Table */}
       <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-gray-900 dark:text-white">Category Name</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Created</TableHead>
-                <TableHead className="text-gray-900 dark:text-white">Last Updated</TableHead>
-                <TableHead className="text-gray-900 dark:text-white text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {categories.map((category) => (
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
+              <p className="mt-2 text-gray-600 dark:text-gray-300">Loading categories...</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-gray-900 dark:text-white">Category Name</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">Created</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white">Last Updated</TableHead>
+                  <TableHead className="text-gray-900 dark:text-white text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {categories.map((category) => (
                 <TableRow key={category.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
@@ -235,13 +232,14 @@ export function CategoriesManagement() {
                   </TableCell>
                 </TableRow>
               ))}
-            </TableBody>
-          </Table>
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
 
       {/* Empty State */}
-      {categories.length === 0 && (
+      {!loading && categories.length === 0 && (
         <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
           <CardContent className="text-center py-12">
             <Tag className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
@@ -287,8 +285,8 @@ export function CategoriesManagement() {
             >
               Cancel
             </Button>
-            <Button onClick={handleEdit} disabled={!formData.name.trim()}>
-              Save Changes
+            <Button onClick={handleEdit} disabled={!formData.name.trim() || isSaving}>
+              {isSaving ? 'Saving...' : 'Save Changes'}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -316,9 +314,10 @@ export function CategoriesManagement() {
             <Button 
               variant="destructive"
               onClick={handleDelete}
+              disabled={isSaving}
               className="bg-red-600 hover:bg-red-700"
             >
-              Delete Category
+              {isSaving ? 'Deleting...' : 'Delete Category'}
             </Button>
           </DialogFooter>
         </DialogContent>
