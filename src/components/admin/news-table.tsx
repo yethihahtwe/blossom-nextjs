@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { getCategories, type Category } from '@/lib/categories'
+import { getAllNews } from '@/lib/news'
+import { ImageUpload } from '@/components/ui/image-upload'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -72,7 +74,7 @@ import {
   AlertTriangle,
   Loader2
 } from 'lucide-react'
-import { getPublishedNews, updateNews, createNews, type News } from '@/lib/news'
+import { updateNews, createNews, type News } from '@/lib/news'
 import { format } from 'date-fns'
 
 const ITEMS_PER_PAGE = 10
@@ -107,6 +109,7 @@ export function NewsTable() {
     title: '',
     content: '',
     excerpt: '',
+    featured_image: '',
     category: '',
     status: 'draft' as 'draft' | 'published' | 'archived'
   })
@@ -116,6 +119,7 @@ export function NewsTable() {
     title: '',
     content: '',
     excerpt: '',
+    featured_image: '',
     category: '',
     status: 'draft' as 'draft' | 'published'
   })
@@ -131,7 +135,7 @@ export function NewsTable() {
     async function fetchData() {
       try {
         const [newsData, categoriesData] = await Promise.all([
-          getPublishedNews(),
+          getAllNews(),
           getCategories()
         ])
         setNews(newsData)
@@ -213,6 +217,7 @@ export function NewsTable() {
       title: article.title,
       content: article.content,
       excerpt: article.excerpt || '',
+      featured_image: article.featured_image || '',
       category: article.category,
       status: article.status as 'draft' | 'published' | 'archived'
     })
@@ -288,12 +293,14 @@ export function NewsTable() {
         title: createForm.title,
         content: createForm.content,
         excerpt: createForm.excerpt,
+        featured_image: createForm.featured_image || undefined,
         category: createForm.category,
         status: createForm.status,
-        featured_image: undefined,
         author: undefined,
         reading_time: undefined
       }
+      
+      console.log('Creating news with data:', newsData)
       const newNews = await createNews(newsData)
       
       if (newNews) {
@@ -305,6 +312,7 @@ export function NewsTable() {
           title: '',
           content: '',
           excerpt: '',
+          featured_image: '',
           category: categories.length > 0 ? categories[0].name : '',
           status: 'draft'
         })
@@ -827,6 +835,13 @@ export function NewsTable() {
               />
             </div>
             
+            <ImageUpload
+              label="Featured Image (Optional)"
+              value={editForm.featured_image}
+              onChange={(url) => setEditForm(prev => ({ ...prev, featured_image: url }))}
+              className="admin-panel"
+            />
+            
             <div>
               <Label className="text-sm font-medium text-gray-900 dark:text-white">
                 Content
@@ -945,6 +960,13 @@ export function NewsTable() {
                 rows={3}
               />
             </div>
+            
+            <ImageUpload
+              label="Featured Image (Optional)"
+              value={createForm.featured_image}
+              onChange={(url) => setCreateForm(prev => ({ ...prev, featured_image: url }))}
+              className="admin-panel"
+            />
             
             <div>
               <Label className="text-sm font-medium text-gray-900 dark:text-white">

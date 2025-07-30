@@ -1,6 +1,23 @@
 import { supabase, type News } from './supabase'
 
 /**
+ * Get all news articles for admin panel (including drafts)
+ */
+export async function getAllNews(): Promise<News[]> {
+  const { data, error } = await supabase
+    .from('news')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching all news:', error)
+    return []
+  }
+
+  return data || []
+}
+
+/**
  * Get all published news articles
  */
 export async function getPublishedNews(): Promise<News[]> {
@@ -145,12 +162,34 @@ export async function updateNews(id: string, updates: Partial<News>): Promise<Ne
  * Create a new news article
  */
 export async function createNews(newsData: Omit<News, 'id' | 'created_at' | 'updated_at' | 'slug' | 'published_at'>): Promise<News | null> {
-  // Generate slug from title
-  const slug = newsData.title
+  // Generate base slug from title
+  const baseSlug = newsData.title
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
-    .substring(0, 100)
+    .substring(0, 90) // Leave room for suffix
+  
+  // Find a unique slug
+  let slug = baseSlug
+  let counter = 1
+  
+  while (true) {
+    // Check if slug exists
+    const { data: existing } = await supabase
+      .from('news')
+      .select('slug')
+      .eq('slug', slug)
+      .single()
+    
+    if (!existing) {
+      // Slug is unique, break out of loop
+      break
+    }
+    
+    // Slug exists, try with counter
+    slug = `${baseSlug}-${counter}`
+    counter++
+  }
 
   const now = new Date().toISOString()
   
@@ -167,6 +206,13 @@ export async function createNews(newsData: Omit<News, 'id' | 'created_at' | 'upd
 
   if (error) {
     console.error('Error creating news:', error)
+    console.error('Error details:', JSON.stringify(error, null, 2))
+    console.error('Data being inserted:', JSON.stringify({
+      ...newsData,
+      slug,
+      published_at: newsData.status === 'published' ? now : null,
+      category: newsData.category || 'General'
+    }, null, 2))
     return null
   }
 
