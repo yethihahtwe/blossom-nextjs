@@ -45,11 +45,37 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        paragraph: {
+          HTMLAttributes: {
+            class: 'text-gray-900 dark:text-gray-900',
+          },
+        },
+        heading: {
+          HTMLAttributes: {
+            class: 'text-gray-900 dark:text-gray-900 font-semibold',
+          },
+        },
+        bold: {
+          HTMLAttributes: {
+            class: 'text-gray-900 dark:text-gray-900 font-semibold',
+          },
+        },
+        italic: {
+          HTMLAttributes: {
+            class: 'text-gray-700 dark:text-gray-700',
+          },
+        },
+        strike: {
+          HTMLAttributes: {
+            class: 'text-gray-600 dark:text-gray-600',
+          },
+        },
+      }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 underline cursor-pointer',
+          class: 'text-blue-600 dark:text-blue-600 underline cursor-pointer',
         },
       }),
       Image.configure({
@@ -64,6 +90,9 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
       Color,
       Highlight.configure({
         multicolor: true,
+        HTMLAttributes: {
+          class: 'bg-yellow-200 dark:bg-yellow-200 text-gray-900 dark:text-gray-900',
+        },
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'],
@@ -81,7 +110,8 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
       attributes: {
         class: cn(
           'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
-          'min-h-[200px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background',
+          'min-h-[200px] w-full rounded-md border border-input bg-white dark:bg-white px-3 py-2 text-sm ring-offset-background',
+          'text-gray-900 dark:text-gray-900',
           'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50',
           className

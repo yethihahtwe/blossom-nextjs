@@ -649,7 +649,7 @@ export function NewsTable() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Content</h3>
                 <div 
-                  className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300"
+                  className="prose dark:prose-invert max-w-none text-gray-700 dark:text-white dark:bg-white px-4 py-4 rounded-lg"
                   dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
                 />
               </div>
