@@ -89,3 +89,5 @@
 
 ## Coding Guidelines
 - Do not explain what you have done in the chat response
+- Do not show a summary of solution in chat response
+- Do not write summary for each chat response

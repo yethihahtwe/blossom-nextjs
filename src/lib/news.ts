@@ -140,3 +140,35 @@ export async function updateNews(id: string, updates: Partial<News>): Promise<Ne
 
   return data
 }
+
+/**
+ * Create a new news article
+ */
+export async function createNews(newsData: Omit<News, 'id' | 'created_at' | 'updated_at' | 'slug' | 'published_at'>): Promise<News | null> {
+  // Generate slug from title
+  const slug = newsData.title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .substring(0, 100)
+
+  const now = new Date().toISOString()
+  
+  const { data, error } = await supabase
+    .from('news')
+    .insert({
+      ...newsData,
+      slug,
+      published_at: newsData.status === 'published' ? now : null, // Only set published_at if status is published
+      category: newsData.category || 'General' // Ensure category is provided
+    })
+    .select()
+    .single()
+
+  if (error) {
+    console.error('Error creating news:', error)
+    return null
+  }
+
+  return data
+}

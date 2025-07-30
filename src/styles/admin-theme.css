@@ -6,6 +6,32 @@
  */
 
 
+/* TipTap Editor Dark Mode Text Fix */
+.dark .ProseMirror strong {
+  color: white !important;
+}
+
+.dark .ProseMirror em {
+  color: #d1d5db !important;
+}
+
+.dark .ProseMirror s {
+  color: #9ca3af !important;
+}
+
+.dark .ProseMirror h1,
+.dark .ProseMirror h2,
+.dark .ProseMirror h3,
+.dark .ProseMirror h4,
+.dark .ProseMirror h5,
+.dark .ProseMirror h6 {
+  color: white !important;
+}
+
+.dark .ProseMirror a {
+  color: #60a5fa !important;
+}
+
 /* Root CSS Variables for Admin Panel */
 :root {
   /* Color System */
@@ -574,4 +600,55 @@
     transition: none !important;
     transform: none !important;
   }
+}
+
+/* Button Overrides for Specific Cases */
+.admin-panel button.bg-green-600 {
+  background-color: #059669 !important; /* green-600 */
+  color: white !important;
+  border: 1px solid #059669 !important;
+}
+
+.admin-panel button.bg-green-600:hover:not(:disabled) {
+  background-color: #047857 !important; /* green-700 */
+  border-color: #047857 !important;
+}
+
+.admin-panel button.bg-green-600:disabled {
+  background-color: #6b7280 !important; /* gray-500 */
+  border-color: #6b7280 !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.admin-panel button.bg-blue-600 {
+  background-color: #2563eb !important; /* blue-600 */
+  color: white !important;
+  border: 1px solid #2563eb !important;
+}
+
+.admin-panel button.bg-blue-600:hover {
+  background-color: #1d4ed8 !important; /* blue-700 */
+  border-color: #1d4ed8 !important;
+}
+
+.admin-panel button.bg-red-600 {
+  background-color: #dc2626 !important; /* red-600 */
+  color: white !important;
+  border: 1px solid #dc2626 !important;
+}
+
+.admin-panel button.bg-red-600:hover {
+  background-color: #b91c1c !important; /* red-700 */
+  border-color: #b91c1c !important;
+}
+
+/* Disabled state for outline buttons */
+.admin-panel button[variant="outline"]:disabled,
+.admin-panel button.outline:disabled {
+  background-color: var(--admin-bg-secondary) !important;
+  color: var(--admin-text-muted) !important;
+  border-color: var(--admin-border-secondary) !important;
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
 }

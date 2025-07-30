@@ -19,12 +19,12 @@ export interface News {
   title: string
   slug: string
   content: string
-  excerpt: string
+  excerpt?: string
   featured_image?: string
   category: string
   author?: string
   reading_time?: number
-  published_at: string
+  published_at?: string
   status: 'draft' | 'published'
   created_at: string
   updated_at: string

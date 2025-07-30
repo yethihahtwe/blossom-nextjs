@@ -48,34 +48,34 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
       StarterKit.configure({
         paragraph: {
           HTMLAttributes: {
-            class: 'text-gray-900 dark:text-gray-900',
+            class: 'text-gray-900 dark:text-gray-100',
           },
         },
         heading: {
           HTMLAttributes: {
-            class: 'text-gray-900 dark:text-gray-900 font-semibold',
+            class: 'text-gray-900 dark:text-white font-semibold',
           },
         },
         bold: {
           HTMLAttributes: {
-            class: 'text-gray-900 dark:text-gray-900 font-semibold',
+            class: 'text-gray-900 dark:text-white font-semibold',
           },
         },
         italic: {
           HTMLAttributes: {
-            class: 'text-gray-700 dark:text-gray-700',
+            class: 'text-gray-700 dark:text-gray-300',
           },
         },
         strike: {
           HTMLAttributes: {
-            class: 'text-gray-600 dark:text-gray-600',
+            class: 'text-gray-600 dark:text-gray-400',
           },
         },
       }),
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-blue-600 dark:text-blue-600 underline cursor-pointer',
+          class: 'text-blue-600 dark:text-blue-400 underline cursor-pointer',
         },
       }),
       Image.configure({
@@ -91,7 +91,7 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
       Highlight.configure({
         multicolor: true,
         HTMLAttributes: {
-          class: 'bg-yellow-200 dark:bg-yellow-200 text-gray-900 dark:text-gray-900',
+          class: 'bg-yellow-200 dark:bg-yellow-600 text-gray-900 dark:text-gray-100',
         },
       }),
       TextAlign.configure({
@@ -110,8 +110,8 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
       attributes: {
         class: cn(
           'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl mx-auto focus:outline-none',
-          'min-h-[200px] w-full rounded-md border border-input bg-white dark:bg-white px-3 py-2 text-sm ring-offset-background',
-          'text-gray-900 dark:text-gray-900',
+          'min-h-[200px] w-full rounded-md border border-input bg-white dark:bg-gray-900 px-3 py-2 text-sm ring-offset-background',
+          'text-gray-900 dark:text-gray-100',
           'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50',
           className

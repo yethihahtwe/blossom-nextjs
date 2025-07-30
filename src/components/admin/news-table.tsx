@@ -68,9 +68,10 @@ import {
   Calendar as CalendarIcon,
   X,
   ChevronDown,
-  AlertTriangle
+  AlertTriangle,
+  Loader2
 } from 'lucide-react'
-import { getPublishedNews, updateNews, type News } from '@/lib/news'
+import { getPublishedNews, updateNews, createNews, type News } from '@/lib/news'
 import { format } from 'date-fns'
 
 const ITEMS_PER_PAGE = 10
@@ -102,8 +103,10 @@ export function NewsTable() {
   // Modal states
   const [viewModalOpen, setViewModalOpen] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
+  const [createModalOpen, setCreateModalOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedArticle, setSelectedArticle] = useState<News | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
   
   // Edit form state
   const [editForm, setEditForm] = useState({
@@ -111,6 +114,15 @@ export function NewsTable() {
     content: '',
     excerpt: '',
     status: 'draft' as 'draft' | 'published' | 'archived'
+  })
+
+  // Create form state
+  const [createForm, setCreateForm] = useState({
+    title: '',
+    content: '',
+    excerpt: '',
+    category: 'General',
+    status: 'draft' as 'draft' | 'published'
   })
 
   useEffect(() => {
@@ -223,8 +235,9 @@ export function NewsTable() {
   }
 
   const handleSaveEdit = async () => {
-    if (!selectedArticle) return
+    if (!selectedArticle || isSaving) return
     
+    setIsSaving(true)
     try {
       // Update the news article in the database
       const updatedNews = await updateNews(selectedArticle.id, editForm)
@@ -242,6 +255,50 @@ export function NewsTable() {
       }
     } catch (error) {
       console.error('Error updating article:', error)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleCreateNew = () => {
+    // Reset the create form
+    setCreateForm({
+      title: '',
+      content: '',
+      excerpt: '',
+      category: 'General',
+      status: 'draft'
+    })
+    setCreateModalOpen(true)
+  }
+
+  const handleSaveCreate = async () => {
+    if (isSaving) return
+    
+    setIsSaving(true)
+    try {
+      // Create the news article in the database
+      const newNews = await createNews(createForm)
+      
+      if (newNews) {
+        // Add to local state
+        setNews(prev => [newNews, ...prev])
+        
+        setCreateModalOpen(false)
+        setCreateForm({
+          title: '',
+          content: '',
+          excerpt: '',
+          category: 'General',
+          status: 'draft'
+        })
+      } else {
+        console.error('Failed to create article')
+      }
+    } catch (error) {
+      console.error('Error creating article:', error)
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -302,7 +359,10 @@ export function NewsTable() {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white">News</h1>
           <p className="text-gray-600 dark:text-gray-300">Manage school news articles</p>
         </div>
-        <Button className="bg-red-600 hover:bg-red-700 text-white dark:text-white">
+        <Button 
+          onClick={handleCreateNew}
+          className="bg-red-600 hover:bg-red-700 text-white dark:text-white"
+        >
           <Plus className="h-4 w-4 mr-2 text-white dark:text-white" />
           New Article
         </Button>
@@ -764,7 +824,7 @@ export function NewsTable() {
                 id="edit-status"
                 value={editForm.status}
                 onChange={(e) => setEditForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' | 'archived' }))}
-                className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+                className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
               >
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -776,16 +836,145 @@ export function NewsTable() {
             <Button 
               variant="outline" 
               onClick={() => setEditModalOpen(false)}
-              className="admin-panel"
+              disabled={isSaving}
+              className="admin-panel disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </Button>
             <Button 
               onClick={handleSaveEdit}
-              className="bg-green-600 hover:bg-green-700 text-white admin-panel"
+              disabled={isSaving}
+              className="bg-green-600 hover:bg-green-700 text-white admin-panel disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Edit className="h-4 w-4 mr-2" />
-              Save Changes
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Modal */}
+      <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
+        <DialogContent className="max-w-7xl w-[90vw] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white admin-panel">
+              Create New Article
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
+              Create a new news article. Fill in all required fields and click save.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 admin-panel">
+            <div>
+              <Label htmlFor="create-title" className="text-sm font-medium text-gray-900 dark:text-white">
+                Title
+              </Label>
+              <Input
+                id="create-title"
+                value={createForm.title}
+                onChange={(e) => setCreateForm(prev => ({ ...prev, title: e.target.value }))}
+                className="mt-1 admin-panel"
+                placeholder="Enter article title..."
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="create-excerpt" className="text-sm font-medium text-gray-900 dark:text-white">
+                Excerpt
+              </Label>
+              <Textarea
+                id="create-excerpt"
+                value={createForm.excerpt}
+                onChange={(e) => setCreateForm(prev => ({ ...prev, excerpt: e.target.value }))}
+                className="mt-1 admin-panel"
+                placeholder="Enter article excerpt..."
+                rows={3}
+              />
+            </div>
+            
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Content
+              </Label>
+              <div className="mt-1">
+                <Editor
+                  content={createForm.content}
+                  onChange={(content) => setCreateForm(prev => ({ ...prev, content }))}
+                  placeholder="Enter article content..."
+                  className="admin-panel"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="create-category" className="text-sm font-medium text-gray-900 dark:text-white">
+                Category
+              </Label>
+              <select
+                id="create-category"
+                value={createForm.category}
+                onChange={(e) => setCreateForm(prev => ({ ...prev, category: e.target.value }))}
+                className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+              >
+                <option value="General">General</option>
+                <option value="Academic Events">Academic Events</option>
+                <option value="School Events">School Events</option>
+                <option value="Cultural Events">Cultural Events</option>
+                <option value="Academic Programs">Academic Programs</option>
+                <option value="Programs">Programs</option>
+                <option value="Facilities">Facilities</option>
+              </select>
+            </div>
+            
+            <div>
+              <Label htmlFor="create-status" className="text-sm font-medium text-gray-900 dark:text-white">
+                Status
+              </Label>
+              <select
+                id="create-status"
+                value={createForm.status}
+                onChange={(e) => setCreateForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' }))}
+                className="mt-1 w-50 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+              >
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setCreateModalOpen(false)}
+              disabled={isSaving}
+              className="admin-panel disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSaveCreate}
+              disabled={isSaving}
+              className="bg-green-600 hover:bg-green-700 text-white admin-panel disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Article
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
