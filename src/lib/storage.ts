@@ -1,62 +1,80 @@
 import { supabase } from './supabase'
 
 /**
- * Upload a file to Supabase Storage
+ * Generic storage service for handling file uploads
  */
-export async function uploadImage(file: File, bucket: string = 'images'): Promise<string | null> {
-  try {
-    // Generate a unique filename
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
-    const filePath = `news/${fileName}`
+export class StorageService {
+  /**
+   * Upload a file to Supabase Storage
+   */
+  static async uploadImage(
+    file: File, 
+    folder: string = 'general',
+    bucket: string = 'images'
+  ): Promise<string | null> {
+    try {
+      // Generate a unique filename
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`
+      const filePath = `${folder}/${fileName}`
 
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
+      const { data, error } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        })
 
-    if (error) {
-      console.error('Error uploading file:', error)
+      if (error) {
+        console.error('Error uploading file:', error)
+        return null
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath)
+
+      return publicUrl
+    } catch (error) {
+      console.error('Error uploading image:', error)
       return null
     }
+  }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath)
+  /**
+   * Delete a file from Supabase Storage
+   */
+  static async deleteImage(url: string, bucket: string = 'images'): Promise<boolean> {
+    try {
+      // Extract file path from URL
+      const urlParts = url.split(`/${bucket}/`)
+      if (urlParts.length < 2) return false
+      
+      const filePath = urlParts[1]
 
-    return publicUrl
-  } catch (error) {
-    console.error('Error uploading image:', error)
-    return null
+      const { error } = await supabase.storage
+        .from(bucket)
+        .remove([filePath])
+
+      if (error) {
+        console.error('Error deleting file:', error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Error deleting image:', error)
+      return false
+    }
   }
 }
 
-/**
- * Delete a file from Supabase Storage
- */
+// Legacy functions for backward compatibility
+export async function uploadImage(file: File, bucket: string = 'images'): Promise<string | null> {
+  return StorageService.uploadImage(file, 'news', bucket)
+}
+
 export async function deleteImage(url: string, bucket: string = 'images'): Promise<boolean> {
-  try {
-    // Extract file path from URL
-    const urlParts = url.split(`/${bucket}/`)
-    if (urlParts.length < 2) return false
-    
-    const filePath = urlParts[1]
-
-    const { error } = await supabase.storage
-      .from(bucket)
-      .remove([filePath])
-
-    if (error) {
-      console.error('Error deleting file:', error)
-      return false
-    }
-
-    return true
-  } catch (error) {
-    console.error('Error deleting image:', error)
-    return false
-  }
+  return StorageService.deleteImage(url, bucket)
 }

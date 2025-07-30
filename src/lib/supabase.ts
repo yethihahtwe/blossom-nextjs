@@ -13,33 +13,13 @@ if (!supabaseKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-// Database Types
-export interface News {
-  id: string
-  title: string
-  slug: string
-  content: string
-  excerpt?: string
-  featured_image?: string
-  category: string
-  author?: string
-  reading_time?: number
-  published_at?: string
-  status: 'draft' | 'published'
-  created_at: string
-  updated_at: string
+import { CategorizedContent, AuthoredContent, PrioritizedContent } from './types/content'
+
+// Database Types extending base interfaces
+export interface News extends CategorizedContent, AuthoredContent {
+  category: string // Make category required for News
 }
 
-export interface Announcement {
-  id: string
-  title: string
-  slug: string
-  content: string
-  excerpt: string
-  featured_image?: string
-  priority: 'normal' | 'important' | 'urgent'
-  published_at: string
-  status: 'draft' | 'published'
-  created_at: string
-  updated_at: string
+export interface Announcement extends PrioritizedContent {
+  excerpt: string // Make excerpt required for Announcements
 }

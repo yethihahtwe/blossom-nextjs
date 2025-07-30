@@ -910,7 +910,7 @@ export function NewsTable() {
               </div>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="edit-category" className="text-sm font-medium text-gray-900 dark:text-white">
                   Category
@@ -944,6 +944,44 @@ export function NewsTable() {
                   <option value="archived">Archived</option>
                 </select>
               </div>
+
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Publish Date (Optional)
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-1 justify-start text-left font-normal admin-panel"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {editForm.published_at ? format(editForm.published_at, "PPP") : "Select publish date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 admin-panel" data-admin-panel>
+                  <Calendar
+                    mode="single"
+                    selected={editForm.published_at}
+                    onSelect={(date) => setEditForm(prev => ({ ...prev, published_at: date }))}
+                    initialFocus
+                    className="bg-white dark:bg-gray-800 admin-panel"
+                  />
+                  {editForm.published_at && (
+                    <div className="p-3 border-t border-gray-200 dark:border-gray-600">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEditForm(prev => ({ ...prev, published_at: undefined }))}
+                        className="w-full"
+                      >
+                        Clear Date
+                      </Button>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
+            </div>
             </div>
           </div>
           <DialogFooter className="gap-2">
@@ -1035,7 +1073,41 @@ export function NewsTable() {
                 />
               </div>
             </div>
-            
+         
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="create-category" className="text-sm font-medium text-gray-900 dark:text-white">
+                  Category
+                </Label>
+                <select
+                  id="create-category"
+                  value={createForm.category}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, category: e.target.value }))}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+                >
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <Label htmlFor="create-status" className="text-sm font-medium text-gray-900 dark:text-white">
+                  Status
+                </Label>
+                <select
+                  id="create-status"
+                  value={createForm.status}
+                  onChange={(e) => setCreateForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' }))}
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
+                >
+                  <option value="draft">Draft</option>
+                  <option value="published">Published</option>
+                </select>
+              </div>
+
             <div>
               <Label className="text-sm font-medium text-gray-900 dark:text-white">
                 Publish Date (Optional)
@@ -1073,40 +1145,6 @@ export function NewsTable() {
                 </PopoverContent>
               </Popover>
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="create-category" className="text-sm font-medium text-gray-900 dark:text-white">
-                  Category
-                </Label>
-                <select
-                  id="create-category"
-                  value={createForm.category}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, category: e.target.value }))}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
-                >
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <Label htmlFor="create-status" className="text-sm font-medium text-gray-900 dark:text-white">
-                  Status
-                </Label>
-                <select
-                  id="create-status"
-                  value={createForm.status}
-                  onChange={(e) => setCreateForm(prev => ({ ...prev, status: e.target.value as 'draft' | 'published' }))}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
-                >
-                  <option value="draft">Draft</option>
-                  <option value="published">Published</option>
-                </select>
-              </div>
             </div>
           </div>
           <DialogFooter className="gap-2">

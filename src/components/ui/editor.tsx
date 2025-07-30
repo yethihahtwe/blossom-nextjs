@@ -13,6 +13,9 @@ import TaskList from '@tiptap/extension-task-list'
 import TaskItem from '@tiptap/extension-task-item'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { uploadImage } from '@/lib/storage'
+import { useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Bold,
   Italic,
@@ -32,6 +35,7 @@ import {
   AlignCenter,
   AlignRight,
   AlignJustify,
+  Upload,
 } from 'lucide-react'
 
 interface EditorProps {
@@ -42,6 +46,10 @@ interface EditorProps {
 }
 
 export function Editor({ content, onChange, placeholder = 'Start writing...', className }: EditorProps) {
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -124,10 +132,80 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
     return null
   }
 
-  const addImage = () => {
+  const handleImageUpload = async (file: File) => {
+    setIsUploadingImage(true)
+    try {
+      const imageUrl = await uploadImage(file)
+      if (imageUrl) {
+        editor.chain().focus().setImage({ src: imageUrl }).run()
+        toast.success('Image uploaded successfully!')
+      } else {
+        toast.error('Failed to upload image')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Failed to upload image')
+    } finally {
+      setIsUploadingImage(false)
+    }
+  }
+
+  const addImageFromFile = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file')
+        return
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB')
+        return
+      }
+      
+      handleImageUpload(file)
+    }
+    // Reset the input
+    event.target.value = ''
+  }
+
+  const addImageFromUrl = () => {
     const url = window.prompt('Enter image URL:')
     if (url) {
       editor.chain().focus().setImage({ src: url }).run()
+    }
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(true)
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+  }
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setIsDragging(false)
+    
+    const files = Array.from(e.dataTransfer.files)
+    const imageFile = files.find(file => file.type.startsWith('image/'))
+    
+    if (imageFile) {
+      // Validate file size
+      if (imageFile.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB')
+        return
+      }
+      handleImageUpload(imageFile)
     }
   }
 
@@ -139,7 +217,15 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
   }
 
   return (
-    <div className="border border-input rounded-lg">
+    <div 
+      className={cn(
+        "border border-input rounded-lg",
+        isDragging && "border-blue-500 bg-blue-50 dark:bg-blue-950"
+      )}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-1 p-2 border-b border-border">
         {/* Text Formatting */}
@@ -271,11 +357,38 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
         <div className="w-px h-6 bg-border mx-1" />
 
         {/* Media & Links */}
-        <Button variant="ghost" size="sm" onClick={addLink} className="h-8 w-8 p-0">
+        <Button variant="ghost" size="sm" onClick={addLink} className="h-8 w-8 p-0" title="Add link">
           <LinkIcon className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="sm" onClick={addImage} className="h-8 w-8 p-0">
-          <ImageIcon className="h-4 w-4" />
+        
+        <div className="w-px h-6 bg-border mx-1" />
+        
+        {/* Image Upload Options */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={addImageFromFile} 
+          disabled={isUploadingImage}
+          className={cn(
+            "h-8 w-8 p-0 relative",
+            isUploadingImage && "bg-blue-100 dark:bg-blue-900"
+          )}
+          title="Upload image file"
+        >
+          {isUploadingImage ? (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+          ) : (
+            <Upload className="h-4 w-4 text-blue-600" />
+          )}
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={addImageFromUrl} 
+          className="h-8 w-8 p-0"
+          title="Add image from URL"
+        >
+          <ImageIcon className="h-4 w-4 text-gray-600" />
         </Button>
 
         <div className="w-px h-6 bg-border mx-1" />
@@ -302,7 +415,28 @@ export function Editor({ content, onChange, placeholder = 'Start writing...', cl
       </div>
 
       {/* Editor Content */}
-      <EditorContent editor={editor} className="min-h-[200px]" />
+      <div className="relative">
+        <EditorContent editor={editor} className="min-h-[200px]" />
+        
+        {/* Drag overlay */}
+        {isDragging && (
+          <div className="absolute inset-0 flex items-center justify-center bg-blue-50 dark:bg-blue-950 bg-opacity-90 border-2 border-dashed border-blue-500 rounded">
+            <div className="text-center">
+              <Upload className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+              <p className="text-blue-600 dark:text-blue-400 font-medium">Drop image here to upload</p>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        style={{ display: 'none' }}
+      />
     </div>
   )
 }
