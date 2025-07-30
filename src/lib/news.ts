@@ -140,12 +140,35 @@ export async function getRecentNews(limit: number = 3): Promise<News[]> {
  * Update an existing news article
  */
 export async function updateNews(id: string, updates: Partial<News>): Promise<News | null> {
+  // Clean the updates object and handle published_at properly
+  const cleanUpdates: any = {}
+  
+  // Copy valid fields, excluding auto-generated ones
+  const allowedFields = ['title', 'content', 'excerpt', 'featured_image', 'category', 'status', 'author', 'reading_time', 'published_at']
+  
+  for (const [key, value] of Object.entries(updates)) {
+    if (allowedFields.includes(key) && value !== undefined) {
+      cleanUpdates[key] = value
+    }
+  }
+  
+  // Handle published_at based on status change and provided date
+  if (updates.status === 'published') {
+    // Use provided published_at or current time if not provided
+    cleanUpdates.published_at = updates.published_at || new Date().toISOString()
+  } else if (updates.status === 'draft') {
+    cleanUpdates.published_at = null
+  } else if (updates.published_at !== undefined) {
+    // Update published_at if explicitly provided
+    cleanUpdates.published_at = updates.published_at
+  }
+  
+  // Always update the updated_at timestamp
+  cleanUpdates.updated_at = new Date().toISOString()
+
   const { data, error } = await supabase
     .from('news')
-    .update({
-      ...updates,
-      updated_at: new Date().toISOString()
-    })
+    .update(cleanUpdates)
     .eq('id', id)
     .select()
     .single()
@@ -161,7 +184,7 @@ export async function updateNews(id: string, updates: Partial<News>): Promise<Ne
 /**
  * Create a new news article
  */
-export async function createNews(newsData: Omit<News, 'id' | 'created_at' | 'updated_at' | 'slug' | 'published_at'>): Promise<News | null> {
+export async function createNews(newsData: Omit<News, 'id' | 'created_at' | 'updated_at' | 'slug'> & { published_at?: string }): Promise<News | null> {
   // Generate base slug from title
   const baseSlug = newsData.title
     .toLowerCase()
@@ -193,13 +216,26 @@ export async function createNews(newsData: Omit<News, 'id' | 'created_at' | 'upd
 
   const now = new Date().toISOString()
   
+  // Determine the published_at value
+  let publishedAt = null
+  if (newsData.status === 'published') {
+    // Use provided published_at or current time if not provided
+    publishedAt = newsData.published_at || now
+  }
+
   const { data, error } = await supabase
     .from('news')
     .insert({
-      ...newsData,
+      title: newsData.title,
+      content: newsData.content,
+      excerpt: newsData.excerpt,
+      featured_image: newsData.featured_image,
+      category: newsData.category || 'General',
+      author: newsData.author,
+      reading_time: newsData.reading_time,
+      status: newsData.status,
       slug,
-      published_at: newsData.status === 'published' ? now : null, // Only set published_at if status is published
-      category: newsData.category || 'General' // Ensure category is provided
+      published_at: publishedAt
     })
     .select()
     .single()
@@ -217,4 +253,21 @@ export async function createNews(newsData: Omit<News, 'id' | 'created_at' | 'upd
   }
 
   return data
+}
+
+/**
+ * Delete a news article
+ */
+export async function deleteNews(id: string): Promise<boolean> {
+  const { error } = await supabase
+    .from('news')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error deleting news:', error)
+    return false
+  }
+
+  return true
 }

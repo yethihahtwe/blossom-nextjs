@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { getCategories, type Category } from '@/lib/categories'
 import { getAllNews } from '@/lib/news'
 import { ImageUpload } from '@/components/ui/image-upload'
+import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -74,7 +75,7 @@ import {
   AlertTriangle,
   Loader2
 } from 'lucide-react'
-import { updateNews, createNews, type News } from '@/lib/news'
+import { updateNews, createNews, deleteNews, type News } from '@/lib/news'
 import { format } from 'date-fns'
 
 const ITEMS_PER_PAGE = 10
@@ -111,7 +112,8 @@ export function NewsTable() {
     excerpt: '',
     featured_image: '',
     category: '',
-    status: 'draft' as 'draft' | 'published' | 'archived'
+    status: 'draft' as 'draft' | 'published' | 'archived',
+    published_at: undefined as Date | undefined
   })
 
   // Create form state
@@ -121,7 +123,8 @@ export function NewsTable() {
     excerpt: '',
     featured_image: '',
     category: '',
-    status: 'draft' as 'draft' | 'published'
+    status: 'draft' as 'draft' | 'published',
+    published_at: undefined as Date | undefined
   })
 
   // Set default category when categories are loaded
@@ -219,7 +222,8 @@ export function NewsTable() {
       excerpt: article.excerpt || '',
       featured_image: article.featured_image || '',
       category: article.category,
-      status: article.status as 'draft' | 'published' | 'archived'
+      status: article.status as 'draft' | 'published' | 'archived',
+      published_at: article.published_at ? new Date(article.published_at) : undefined
     })
     setEditModalOpen(true)
   }
@@ -233,15 +237,31 @@ export function NewsTable() {
     if (!selectedArticle) return
     
     try {
-      // TODO: Implement actual delete API call
-      // await deleteNews(selectedArticle.id)
+      const success = await deleteNews(selectedArticle.id)
       
-      // For now, remove from local state
-      setNews(prev => prev.filter(item => item.id !== selectedArticle.id))
-      setDeleteDialogOpen(false)
-      setSelectedArticle(null)
+      if (success) {
+        // Remove from local state
+        setNews(prev => prev.filter(item => item.id !== selectedArticle.id))
+        setDeleteDialogOpen(false)
+        setSelectedArticle(null)
+        
+        // Show success message
+        toast.success('Article deleted successfully!', {
+          duration: 4000,
+          position: 'top-right',
+        })
+      } else {
+        toast.error('Failed to delete article. Please try again.', {
+          duration: 4000,
+          position: 'top-right',
+        })
+      }
     } catch (error) {
       console.error('Error deleting article:', error)
+      toast.error('An error occurred while deleting the article.', {
+        duration: 4000,
+        position: 'top-right',
+      })
     }
   }
 
@@ -251,7 +271,11 @@ export function NewsTable() {
     setIsSaving(true)
     try {
       // Update the news article in the database
-      const updatedNews = await updateNews(selectedArticle.id, editForm)
+      const updateData = {
+        ...editForm,
+        published_at: editForm.published_at ? editForm.published_at.toISOString() : undefined
+      }
+      const updatedNews = await updateNews(selectedArticle.id, updateData)
       
       if (updatedNews) {
         // Update local state with the updated article
@@ -261,11 +285,25 @@ export function NewsTable() {
         
         setEditModalOpen(false)
         setSelectedArticle(null)
+        
+        // Show success message
+        toast.success('Article saved successfully!', {
+          duration: 4000,
+          position: 'top-right',
+        })
       } else {
         console.error('Failed to update article')
+        toast.error('Failed to save article. Please try again.', {
+          duration: 4000,
+          position: 'top-right',
+        })
       }
     } catch (error) {
       console.error('Error updating article:', error)
+      toast.error('An error occurred while saving the article.', {
+        duration: 4000,
+        position: 'top-right',
+      })
     } finally {
       setIsSaving(false)
     }
@@ -296,6 +334,7 @@ export function NewsTable() {
         featured_image: createForm.featured_image || undefined,
         category: createForm.category,
         status: createForm.status,
+        published_at: createForm.published_at ? createForm.published_at.toISOString() : undefined,
         author: undefined,
         reading_time: undefined
       }
@@ -314,13 +353,28 @@ export function NewsTable() {
           excerpt: '',
           featured_image: '',
           category: categories.length > 0 ? categories[0].name : '',
-          status: 'draft'
+          status: 'draft',
+          published_at: undefined
+        })
+        
+        // Show success message
+        toast.success('Article created successfully!', {
+          duration: 4000,
+          position: 'top-right',
         })
       } else {
         console.error('Failed to create article - createNews returned null')
+        toast.error('Failed to create article. Please try again.', {
+          duration: 4000,
+          position: 'top-right',
+        })
       }
     } catch (error) {
       console.error('Error creating article:', error)
+      toast.error('An error occurred while creating the article.', {
+        duration: 4000,
+        position: 'top-right',
+      })
     } finally {
       setIsSaving(false)
     }
@@ -980,6 +1034,44 @@ export function NewsTable() {
                   className="admin-panel"
                 />
               </div>
+            </div>
+            
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Publish Date (Optional)
+              </Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="w-full mt-1 justify-start text-left font-normal admin-panel"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {createForm.published_at ? format(createForm.published_at, "PPP") : "Select publish date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 admin-panel" data-admin-panel>
+                  <Calendar
+                    mode="single"
+                    selected={createForm.published_at}
+                    onSelect={(date) => setCreateForm(prev => ({ ...prev, published_at: date }))}
+                    initialFocus
+                    className="bg-white dark:bg-gray-800 admin-panel"
+                  />
+                  {createForm.published_at && (
+                    <div className="p-3 border-t border-gray-200 dark:border-gray-600">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCreateForm(prev => ({ ...prev, published_at: undefined }))}
+                        className="w-full"
+                      >
+                        Clear Date
+                      </Button>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
             </div>
             
             <div className="grid grid-cols-2 gap-4">

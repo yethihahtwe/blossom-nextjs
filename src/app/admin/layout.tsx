@@ -7,6 +7,7 @@ import { AdminHeader } from '@/components/admin/layout/admin-header'
 import { AdminThemeProvider } from '@/components/admin/theme-provider'
 import { supabase } from '@/lib/supabase'
 import { montserrat } from './font'
+import { Toaster } from 'react-hot-toast'
 
 export default function AdminLayout({
   children,
@@ -88,6 +89,25 @@ export default function AdminLayout({
           </main>
         </div>
       </div>
+      <Toaster 
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#10b981',
+            color: '#fff',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500',
+          },
+          success: {
+            iconTheme: {
+              primary: '#fff',
+              secondary: '#10b981',
+            },
+          },
+        }}
+      />
     </AdminThemeProvider>
   )
 }
