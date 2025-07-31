@@ -1,5 +1,6 @@
--- Blossom Private School Database Schema
--- Run this in your Supabase SQL Editor to create the required tables
+-- Blossom Private School Complete Database Schema
+-- Run this in your Supabase SQL Editor to create all required tables, storage, and policies
+-- This file consolidates all database setup in one place
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -180,6 +181,29 @@ CREATE POLICY "Allow public read access to published news" ON news
 
 CREATE POLICY "Allow public read access to published announcements" ON announcements
   FOR SELECT USING (status = 'published');
+
+-- Allow authenticated users to manage all content (admin operations)
+CREATE POLICY "Authenticated users can manage news" ON news
+  FOR ALL USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "Authenticated users can manage announcements" ON announcements
+  FOR ALL USING (auth.uid() IS NOT NULL);
+
+-- Storage Setup
+-- Create storage bucket for images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('images', 'images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Set up storage policies
+CREATE POLICY "Authenticated users can upload images" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'images' AND auth.uid() IS NOT NULL);
+
+CREATE POLICY "Public can view images" ON storage.objects
+  FOR SELECT USING (bucket_id = 'images');
+
+CREATE POLICY "Authenticated users can delete their images" ON storage.objects
+  FOR DELETE USING (bucket_id = 'images' AND auth.uid() IS NOT NULL);
 
 -- Categories Table
 CREATE TABLE IF NOT EXISTS categories (

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { BaseContent } from '@/lib/types/content'
-import { DateFormatter } from '@/lib/utils'
+import { DateFormatter } from '@/lib/utils/date-formatter'
 
 /**
  * Configuration for content formatters

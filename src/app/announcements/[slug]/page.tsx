@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getAnnouncementBySlug, getPublishedAnnouncements } from '@/lib/announcements';
+import { announcementsService } from '@/lib/services/announcements.service';
+import { DateFormatter } from '@/lib/utils/date-formatter';
 import { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -13,7 +14,7 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const announcement = await getAnnouncementBySlug(slug);
+  const announcement = await announcementsService.getBySlug(slug);
 
   if (!announcement) {
     return {
@@ -27,22 +28,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: announcement.title,
       description: announcement.excerpt,
-      images: [announcement.featured_image],
+      images: announcement.featured_image ? [announcement.featured_image] : [],
       type: 'article',
-      publishedTime: announcement.published_at,
-      authors: announcement.author ? [announcement.author] : undefined,
+      publishedTime: announcement.published_at || undefined,
     },
     twitter: {
       card: 'summary_large_image',
       title: announcement.title,
       description: announcement.excerpt,
-      images: [announcement.featured_image],
+      images: announcement.featured_image ? [announcement.featured_image] : [],
     },
   };
 }
 
 export async function generateStaticParams() {
-  const announcements = await getPublishedAnnouncements();
+  const announcements = await announcementsService.getPublished();
   return announcements.map((announcement) => ({
     slug: announcement.slug,
   }));
@@ -50,19 +50,11 @@ export async function generateStaticParams() {
 
 export default async function AnnouncementPage({ params }: PageProps) {
   const { slug } = await params;
-  const announcement = await getAnnouncementBySlug(slug);
+  const announcement = await announcementsService.getBySlug(slug);
 
   if (!announcement || announcement.status !== 'published') {
     notFound();
   }
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   const getPriorityStyle = (priority: string) => {
     switch (priority) {
@@ -88,7 +80,7 @@ export default async function AnnouncementPage({ params }: PageProps) {
     }
   };
 
-  const allAnnouncements = await getPublishedAnnouncements();
+  const allAnnouncements = await announcementsService.getPublished();
   const relatedAnnouncements = allAnnouncements
     .filter(item => item.id !== announcement.id && item.priority === announcement.priority)
     .slice(0, 3);
@@ -143,10 +135,11 @@ export default async function AnnouncementPage({ params }: PageProps) {
             </h1>
             
             <div className="flex flex-wrap items-center text-gray-600 text-sm gap-4 mb-6">
-              <time dateTime={announcement.published_at}>
-                {formatDate(announcement.published_at)}
-              </time>
-              
+              {announcement.published_at && (
+                <time dateTime={announcement.published_at}>
+                  {DateFormatter.formatDate(announcement.published_at)}
+                </time>
+              )}
             </div>
             
             <p className="text-xl text-gray-700 leading-relaxed mb-8">
@@ -155,15 +148,17 @@ export default async function AnnouncementPage({ params }: PageProps) {
           </div>
 
           {/* Featured Image */}
-          <div className="relative h-96 w-full">
-            <Image
-              src={announcement.featured_image}
-              alt={announcement.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+          {announcement.featured_image && (
+            <div className="relative h-96 w-full">
+              <Image
+                src={announcement.featured_image}
+                alt={announcement.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
 
           {/* Content */}
           <div className="p-8">
@@ -186,15 +181,17 @@ export default async function AnnouncementPage({ params }: PageProps) {
                   href={`/announcements/${item.slug}`}
                   className="block bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
                 >
-                  <div className="relative h-32 w-full">
-                    <Image
-                      src={item.featured_image}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
+                  {item.featured_image && (
+                    <div className="relative h-32 w-full">
+                      <Image
+                        src={item.featured_image}
+                        alt={item.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    </div>
+                  )}
                   <div className="p-4">
                     <div className="mb-2">
                       <span 
@@ -207,9 +204,11 @@ export default async function AnnouncementPage({ params }: PageProps) {
                     <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-2">
                       {item.title}
                     </h3>
-                    <time className="text-xs text-gray-500" dateTime={item.published_at}>
-                      {formatDate(item.published_at)}
-                    </time>
+                    {item.published_at && (
+                      <time className="text-xs text-gray-500" dateTime={item.published_at}>
+                        {DateFormatter.formatDate(item.published_at)}
+                      </time>
+                    )}
                   </div>
                 </Link>
               ))}

@@ -1,65 +1,80 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
-import { getPublishedAnnouncements, type Announcement } from '@/lib/announcements';
-import AnnouncementCard from '@/components/AnnouncementCard';
+import { useState, useEffect } from 'react';
+import { announcementsService } from '@/lib/services/announcements.service';
+import { type Announcement } from '@/lib/supabase';
+import { Priority } from '@/lib/types/content';
+import { ContentCard, announcementFormatters } from '@/components/ui/content-card';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ScrollToTop from '@/components/ScrollToTop';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const ITEMS_PER_PAGE = 6;
 
 export default function AnnouncementsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedPriority, setSelectedPriority] = useState<string>('');
+  const [selectedPriority, setSelectedPriority] = useState<Priority | ''>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [allAnnouncements, setAllAnnouncements] = useState<Announcement[]>([]);
+  const [priorities, setPriorities] = useState<Priority[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filteredAnnouncements, setFilteredAnnouncements] = useState<Announcement[]>([]);
 
+  // Load initial data
   useEffect(() => {
-    async function fetchAnnouncements() {
+    const loadData = async () => {
+      setLoading(true);
       try {
-        const announcements = await getPublishedAnnouncements();
-        setAllAnnouncements(announcements);
+        const [announcementsData, prioritiesData] = await Promise.all([
+          announcementsService.getOrderedByPriority(), // Use priority-ordered retrieval
+          announcementsService.getPriorities()
+        ]);
+        setAllAnnouncements(announcementsData);
+        setPriorities(prioritiesData);
       } catch (error) {
-        console.error('Error fetching announcements:', error);
+        console.error('Error loading announcements data:', error);
       } finally {
         setLoading(false);
       }
-    }
-    fetchAnnouncements();
+    };
+
+    loadData();
   }, []);
 
-  const filteredAnnouncements = useMemo(() => {
-    let filtered = allAnnouncements;
+  // Handle filtering
+  useEffect(() => {
+    const filterAnnouncements = async () => {
+      try {
+        let filtered: Announcement[] = [];
 
-    if (searchQuery) {
-      // Filter by search query
-      filtered = filtered.filter(announcement => 
-        announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        announcement.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        announcement.excerpt?.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+        if (searchQuery) {
+          // Use search function for search queries
+          filtered = await announcementsService.search(searchQuery);
+          
+          // Apply priority filter to search results if priority is selected
+          if (selectedPriority) {
+            filtered = filtered.filter(announcement => announcement.priority === selectedPriority);
+          }
+        } else if (selectedPriority) {
+          // Use priority function if only priority is selected
+          filtered = await announcementsService.getByPriority(selectedPriority);
+        } else {
+          // Use all announcements if no filters
+          filtered = allAnnouncements;
+        }
 
-    if (selectedPriority) {
-      filtered = filtered.filter(announcement => announcement.priority === selectedPriority);
-    }
-
-    return filtered.sort((a, b) => {
-      // Sort by priority first (urgent > important > normal)
-      const priorityOrder = { urgent: 3, important: 2, normal: 1 };
-      const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || 1;
-      const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || 1;
-      
-      if (aPriority !== bPriority) {
-        return bPriority - aPriority;
+        setFilteredAnnouncements(filtered);
+      } catch (error) {
+        console.error('Error filtering announcements:', error);
+        setFilteredAnnouncements([]);
       }
-      
-      // Then sort by date (newest first)
-      return new Date(b.published_at).getTime() - new Date(a.published_at).getTime();
-    });
-  }, [allAnnouncements, searchQuery, selectedPriority]);
+    };
+
+    if (!loading) {
+      filterAnnouncements();
+    }
+  }, [allAnnouncements, searchQuery, selectedPriority, loading]);
 
   const totalPages = Math.ceil(filteredAnnouncements.length / ITEMS_PER_PAGE);
   const currentAnnouncements = filteredAnnouncements.slice(
@@ -72,9 +87,29 @@ export default function AnnouncementsPage() {
     setCurrentPage(1);
   };
 
-  const handlePriorityChange = (priority: string) => {
+  const handlePriorityChange = (priority: Priority | '') => {
     setSelectedPriority(priority);
     setCurrentPage(1);
+  };
+
+  const getPriorityDisplayName = (priority: Priority) => {
+    return priority.charAt(0).toUpperCase() + priority.slice(1);
+  };
+
+  const getPriorityButtonClass = (priority: Priority | '', isSelected: boolean) => {
+    const baseClass = 'px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200';
+    
+    if (isSelected) {
+      const selectedClasses = {
+        '': 'bg-red-600 text-white shadow-md',
+        'urgent': 'bg-red-600 text-white shadow-md',
+        'important': 'bg-yellow-600 text-white shadow-md', 
+        'normal': 'bg-blue-600 text-white shadow-md'
+      };
+      return `${baseClass} ${selectedClasses[priority]}`;
+    }
+    
+    return `${baseClass} bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200`;
   };
 
   const handlePageChange = (page: number) => {
@@ -133,73 +168,88 @@ export default function AnnouncementsPage() {
           <div className="mb-8 bg-white p-6 rounded-xl shadow-lg border border-gray-100">
             <div className="w-full">
               <div className="flex flex-wrap gap-2 justify-start">
-                <button
-                  onClick={() => handlePriorityChange('')}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    selectedPriority === '' 
-                      ? 'bg-red-600 text-white shadow-md' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                  }`}
-                >
-                  All Priorities
-                </button>
-                <button
-                  onClick={() => handlePriorityChange('urgent')}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    selectedPriority === 'urgent' 
-                      ? 'bg-red-600 text-white shadow-md' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                  }`}
-                >
-                  Urgent
-                </button>
-                <button
-                  onClick={() => handlePriorityChange('important')}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    selectedPriority === 'important' 
-                      ? 'bg-red-600 text-white shadow-md' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                  }`}
-                >
-                  Important
-                </button>
-                <button
-                  onClick={() => handlePriorityChange('normal')}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                    selectedPriority === 'normal' 
-                      ? 'bg-red-600 text-white shadow-md' 
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200'
-                  }`}
-                >
-                  Normal
-                </button>
+                {loading ? (
+                  <>
+                    <Skeleton className="h-9 w-28 rounded-lg" />
+                    <Skeleton className="h-9 w-24 rounded-lg" />
+                    <Skeleton className="h-9 w-32 rounded-lg" />
+                    <Skeleton className="h-9 w-28 rounded-lg" />
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => handlePriorityChange('')}
+                      className={getPriorityButtonClass('', selectedPriority === '')}
+                    >
+                      All Priorities
+                    </button>
+                    {priorities.map((priority) => (
+                      <button
+                        key={priority}
+                        onClick={() => handlePriorityChange(priority)}
+                        className={getPriorityButtonClass(priority, selectedPriority === priority)}
+                      >
+                        {getPriorityDisplayName(priority)}
+                      </button>
+                    ))}
+                  </>
+                )}
               </div>
             </div>
           </div>
 
           {/* Results Info */}
           <div className="mb-6">
-            <p className="text-gray-600">
-              {filteredAnnouncements.length === 0 
-                ? 'No announcements found matching your criteria.' 
-                : `Showing ${Math.min(ITEMS_PER_PAGE, filteredAnnouncements.length - (currentPage - 1) * ITEMS_PER_PAGE)} of ${filteredAnnouncements.length} announcements`
-              }
-            </p>
+            {loading ? (
+              <Skeleton className="h-5 w-48" />
+            ) : (
+              <p className="text-gray-600">
+                {filteredAnnouncements.length === 0 
+                  ? 'No announcements found matching your criteria.' 
+                  : `Showing ${Math.min(ITEMS_PER_PAGE, filteredAnnouncements.length - (currentPage - 1) * ITEMS_PER_PAGE)} of ${filteredAnnouncements.length} announcements`
+                }
+              </p>
+            )}
           </div>
 
           {/* Announcements Grid */}
           {loading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 text-lg">Loading announcements...</p>
+            <div className="news-grid">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="news-card-article">
+                  {/* Image skeleton */}
+                  <Skeleton className="news-image-container" />
+                  
+                  {/* Content skeleton */}
+                  <div className="news-content-container">
+                    {/* Date skeleton */}
+                    <Skeleton className="h-4 w-24 mb-3" />
+                    
+                    {/* Title skeleton */}
+                    <Skeleton className="h-6 w-full mb-2" />
+                    <Skeleton className="h-6 w-3/4 mb-3" />
+                    
+                    {/* Excerpt skeleton */}
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-2/3 mb-4" />
+                    
+                    {/* Priority badge skeleton */}
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : currentAnnouncements.length > 0 ? (
             <div className="news-grid">
               {currentAnnouncements.map((announcement) => (
-                <AnnouncementCard 
+                <ContentCard 
                   key={announcement.id} 
-                  announcement={announcement} 
+                  content={announcement} 
                   showExcerpt={true} 
-                  showCategory={false} 
+                  formatters={announcementFormatters}
                 />
               ))}
             </div>

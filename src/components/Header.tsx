@@ -3,11 +3,16 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { CompactAnnouncementBanner } from './announcement-banner';
 
 const Header = () => {
   const pathname = usePathname();
   return (
-    <header className="site-header" role="banner">
+    <>
+      {/* Urgent Announcement Banner */}
+      <CompactAnnouncementBanner />
+      
+      <header className="site-header" role="banner">
       <div className="header-content">
         {/* Site Logo and Title */}
         <div className="site-branding">
@@ -46,6 +51,7 @@ const Header = () => {
         </button>
       </div>
     </header>
+    </>
   );
 };
 

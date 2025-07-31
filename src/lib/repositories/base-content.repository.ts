@@ -1,7 +1,8 @@
 import { supabase } from '../supabase'
 import { BaseContent, ContentRepository } from '../types/content'
 import { SlugGenerator } from '../utils/slug-generator'
-import { ContentValidator, DateFormatter } from '../utils'
+import { ContentValidator } from '../utils/content-validator'
+import { DateFormatter } from '../utils/date-formatter'
 
 /**
  * Base repository implementation for content entities
