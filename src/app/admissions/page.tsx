@@ -160,52 +160,6 @@ export default function AdmissionsPage() {
               </div>
             </div>
 
-            {/* Tuition and Fees */}
-            <div className="mb-12">
-              <div className="bg-white rounded-xl shadow-lg p-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6" style={{color: '#791218'}}>
-                  Tuition and Fees
-                </h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b-2" style={{borderColor: '#791218'}}>
-                        <th className="text-left py-4 px-6 font-semibold text-gray-900">Grade Level</th>
-                        <th className="text-right py-4 px-6 font-semibold text-gray-900">Annual Tuition</th>
-                        <th className="text-right py-4 px-6 font-semibold text-gray-900">Registration Fee</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-gray-200">
-                        <td className="py-4 px-6">Kindergarten (KG)</td>
-                        <td className="py-4 px-6 text-right">$3,500</td>
-                        <td className="py-4 px-6 text-right">$200</td>
-                      </tr>
-                      <tr className="border-b border-gray-200">
-                        <td className="py-4 px-6">Primary (Grades 1-5)</td>
-                        <td className="py-4 px-6 text-right">$4,200</td>
-                        <td className="py-4 px-6 text-right">$250</td>
-                      </tr>
-                      <tr className="border-b border-gray-200">
-                        <td className="py-4 px-6">Secondary (Grades 6-10)</td>
-                        <td className="py-4 px-6 text-right">$5,800</td>
-                        <td className="py-4 px-6 text-right">$300</td>
-                      </tr>
-                      <tr className="border-b border-gray-200">
-                        <td className="py-4 px-6">Senior (Grades 11-12)</td>
-                        <td className="py-4 px-6 text-right">$6,500</td>
-                        <td className="py-4 px-6 text-right">$350</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-                <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Note:</strong> Fees are subject to change. Additional costs may include uniforms, textbooks, transportation, and extracurricular activities. Financial assistance programs are available for qualifying families.
-                  </p>
-                </div>
-              </div>
-            </div>
 
             {/* Contact Information */}
             <div className="bg-white rounded-xl shadow-lg p-8">
@@ -247,7 +201,7 @@ export default function AdmissionsPage() {
                       </div>
                       <div>
                         <div className="font-semibold">Address</div>
-                        <div className="text-gray-600">123 Education Street<br />Yangon, Myanmar</div>
+                        <div className="text-gray-600">Thatipahtan Street, Myingyan, Myanmar</div>
                       </div>
                     </div>
                   </div>
@@ -267,14 +221,6 @@ export default function AdmissionsPage() {
                       <span className="font-medium">Sunday</span>
                       <span className="text-gray-600">Closed</span>
                     </div>
-                  </div>
-                  <div className="mt-6">
-                    <button 
-                      className="w-full px-6 py-3 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity duration-200"
-                      style={{backgroundColor: '#791218'}}
-                    >
-                      Schedule a School Visit
-                    </button>
                   </div>
                 </div>
               </div>
