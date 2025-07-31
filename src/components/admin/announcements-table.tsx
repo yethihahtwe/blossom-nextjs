@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { Editor } from '@/components/ui/editor'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,9 +35,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { CalendarIcon, Search, Plus, Edit, Trash2, Eye, Filter, MoreHorizontal, AlertTriangle } from 'lucide-react'
+import { CalendarIcon, Search, Plus, Edit, Trash2, Eye, Filter, MoreHorizontal, AlertTriangle, ChevronDown, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { cn } from '@/lib/utils'
+
+const ITEMS_PER_PAGE = 10
 
 export function AnnouncementsTable() {
   // State management
@@ -79,6 +82,11 @@ export function AnnouncementsTable() {
   // Date picker states
   const [createDatePickerOpen, setCreateDatePickerOpen] = useState(false)
   const [editDatePickerOpen, setEditDatePickerOpen] = useState(false)
+  
+  // Filter popup states
+  const [isPriorityFilterOpen, setIsPriorityFilterOpen] = useState(false)
+  const [isStatusFilterOpen, setIsStatusFilterOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
 
   // Load announcements
   useEffect(() => {
@@ -107,6 +115,19 @@ export function AnnouncementsTable() {
 
     setFilteredAnnouncements(filtered)
   }, [announcements, searchQuery, priorityFilter, statusFilter])
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setPriorityFilter('')
+    setStatusFilter('')
+    setCurrentPage(1)
+  }
+
+  const hasActiveFilters = searchQuery || priorityFilter || statusFilter
+  
+  const totalPages = Math.ceil(filteredAnnouncements.length / ITEMS_PER_PAGE)
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+  const paginatedAnnouncements = filteredAnnouncements.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 
   const loadAnnouncements = async () => {
     try {
@@ -324,42 +345,187 @@ export function AnnouncementsTable() {
         </Button>
       </div>
 
-      {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border p-4 space-y-4">
-        <div className="flex flex-wrap gap-4">
-          {/* Search */}
-          <div className="relative flex-1 min-w-64">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+      {/* Search and Filter Section */}
+      <div className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600 p-6 space-y-4">
+        {/* Search Row */}
+        <div className="flex items-center justify-between gap-4">
+          {/* Search on the left */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
             <Input
               placeholder="Search announcements..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setCurrentPage(1)
+              }}
+              className="pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 admin-panel"
             />
           </div>
           
-          {/* Priority Filter */}
-          <select
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value as Priority | '')}
-            className="px-3 py-2 border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-700"
-          >
-            <option value="">All Priorities</option>
-            <option value="urgent">Urgent</option>
-            <option value="important">Important</option>
-            <option value="normal">Normal</option>
-          </select>
-          
-          {/* Status Filter */}
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as 'draft' | 'published' | '')}
-            className="px-3 py-2 border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-700"
-          >
-            <option value="">All Status</option>
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
-          </select>
+          {/* Filters on the right */}
+          <div className="flex items-center gap-2">
+            {/* Priority Filter */}
+            <Popover open={isPriorityFilterOpen} onOpenChange={setIsPriorityFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className={`border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 admin-panel transition-colors ${priorityFilter ? 'bg-orange-50 dark:bg-orange-900/20 border-orange-300 dark:border-orange-600' : ''}`}
+                >
+                  <Filter className="h-4 w-4 mr-2" />
+                  Priority
+                  {priorityFilter && (
+                    <Badge className="ml-2 h-5 w-5 p-0 text-xs bg-orange-600 text-white flex items-center justify-center">
+                      1
+                    </Badge>
+                  )}
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg admin-panel" align="end" data-admin-panel>
+                <div className="space-y-4">
+                  <h4 className="font-medium text-gray-900 dark:text-white text-base">Filter by Priority</h4>
+                  <div className="space-y-2">
+                    {(['urgent', 'important', 'normal'] as Priority[]).map((priority) => (
+                      <div key={priority} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={priority}
+                          checked={priorityFilter === priority}
+                          onCheckedChange={(checked) => {
+                            setPriorityFilter(checked ? priority : '')
+                            setCurrentPage(1)
+                          }}
+                        />
+                        <Label 
+                          htmlFor={priority}
+                          className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer font-normal"
+                        >
+                          {priority.charAt(0).toUpperCase() + priority.slice(1)}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  {priorityFilter && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setPriorityFilter('')}
+                      className="w-full admin-panel"
+                    >
+                      Clear Priority
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            {/* Status Filter */}
+            <Popover open={isStatusFilterOpen} onOpenChange={setIsStatusFilterOpen}>
+              <PopoverTrigger asChild>
+                <Button 
+                  variant="outline"
+                  className={`border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 admin-panel transition-colors ${statusFilter ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-600' : ''}`}
+                >
+                  <Filter className="h-4 w-4 mr-2" />
+                  Status
+                  {statusFilter && (
+                    <Badge className="ml-2 h-5 w-5 p-0 text-xs bg-green-600 text-white flex items-center justify-center">
+                      1
+                    </Badge>
+                  )}
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg admin-panel" align="end" data-admin-panel>
+                <div className="p-3 space-y-3">
+                  <h4 className="font-medium text-gray-900 dark:text-white text-sm">Filter by Status</h4>
+                  <div className="space-y-2">
+                    {(['draft', 'published'] as const).map((status) => (
+                      <div key={status} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={status}
+                          checked={statusFilter === status}
+                          onCheckedChange={(checked) => {
+                            setStatusFilter(checked ? status : '')
+                            setCurrentPage(1)
+                          }}
+                        />
+                        <Label 
+                          htmlFor={status}
+                          className="text-sm text-gray-700 dark:text-gray-300 cursor-pointer font-normal"
+                        >
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </Label>
+                      </div>
+                    ))}
+                  </div>
+                  {statusFilter && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setStatusFilter('')}
+                      className="w-full admin-panel text-xs h-7"
+                    >
+                      Clear Status
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          </div>
+        </div>
+
+        {/* Active Filters Section - Always Reserved Space */}
+        <div className="min-h-[2.5rem] flex items-center">
+          {hasActiveFilters ? (
+            <div className="flex items-center gap-2 flex-wrap w-full">
+              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium flex-shrink-0">Active filters:</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                {searchQuery && (
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700 admin-panel font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors cursor-pointer group"
+                    onClick={() => setSearchQuery('')}
+                  >
+                    <span className="text-xs">Search: {searchQuery}</span>
+                    <X className="ml-1 h-3 w-3 group-hover:text-blue-900 dark:group-hover:text-blue-100 transition-colors" />
+                  </Badge>
+                )}
+                {priorityFilter && (
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 border border-orange-200 dark:border-orange-700 admin-panel font-medium hover:bg-orange-200 dark:hover:bg-orange-800 transition-colors cursor-pointer group"
+                    onClick={() => setPriorityFilter('')}
+                  >
+                    <span className="text-xs">Priority: {priorityFilter}</span>
+                    <X className="ml-1 h-3 w-3 group-hover:text-orange-900 dark:group-hover:text-orange-100 transition-colors" />
+                  </Badge>
+                )}
+                {statusFilter && (
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-700 admin-panel font-medium hover:bg-green-200 dark:hover:bg-green-800 transition-colors cursor-pointer group"
+                    onClick={() => setStatusFilter('')}
+                  >
+                    <span className="text-xs">Status: {statusFilter}</span>
+                    <X className="ml-1 h-3 w-3 group-hover:text-green-900 dark:group-hover:text-green-100 transition-colors" />
+                  </Badge>
+                )}
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={clearFilters} 
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 admin-panel font-medium text-xs hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0 ml-auto"
+              >
+                Clear all
+              </Button>
+            </div>
+          ) : (
+            <div className="w-full h-10 flex items-center">
+              <span className="text-sm text-gray-400 dark:text-gray-500 font-normal italic">No active filters</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -377,7 +543,7 @@ export function AnnouncementsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAnnouncements.map((announcement) => (
+            {paginatedAnnouncements.map((announcement) => (
               <TableRow key={announcement.id}>
                 <TableCell>
                   <div>
@@ -443,6 +609,57 @@ export function AnnouncementsTable() {
             ))}
           </TableBody>
         </Table>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/20">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, filteredAnnouncements.length)} of {filteredAnnouncements.length} results
+            </div>
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="admin-panel"
+              >
+                Previous
+              </Button>
+              
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setCurrentPage(page)}
+                  className={`admin-panel ${currentPage === page ? 'bg-red-600 hover:bg-red-700 text-white' : ''}`}
+                >
+                  {page}
+                </Button>
+              ))}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="admin-panel"
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Show pagination info even when only one page */}
+        {totalPages === 1 && filteredAnnouncements.length > 0 && (
+          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/20">
+            <div className="text-sm text-gray-600 dark:text-gray-400">
+              Showing {filteredAnnouncements.length} of {filteredAnnouncements.length} results
+            </div>
+          </div>
+        )}
 
         {filteredAnnouncements.length === 0 && (
           <div className="text-center py-8">

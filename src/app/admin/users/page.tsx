@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -65,27 +64,17 @@ export default function UsersPage() {
     try {
       setLoading(true)
       
-      // Get all users from auth.users (admin only operation)
-      const { data: { users }, error } = await supabase.auth.admin.listUsers()
+      // Call API route to get users
+      const response = await fetch('/api/admin/users')
+      const data = await response.json()
       
-      if (error) {
-        console.error('Error loading users:', error)
-        toast.error('Failed to load users')
+      if (!response.ok) {
+        console.error('Error loading users:', data.error)
+        toast.error(data.error || 'Failed to load users')
         return
       }
-
-      // Get user roles from profiles table if it exists
-      const { data: profiles } = await supabase
-        .from('user_profiles')
-        .select('user_id, role')
       
-      // Merge user data with profiles
-      const usersWithRoles = users.map(user => ({
-        ...user,
-        role: profiles?.find(p => p.user_id === user.id)?.role || 'viewer'
-      }))
-      
-      setUsers(usersWithRoles)
+      setUsers(data.users)
     } catch (error) {
       console.error('Error loading users:', error)
       toast.error('Failed to load users')
@@ -107,28 +96,25 @@ export default function UsersPage() {
 
     setIsSaving(true)
     try {
-      // Create user via Supabase auth admin
-      const { data, error } = await supabase.auth.admin.createUser({
-        email: createForm.email,
-        password: createForm.password,
-        email_confirm: true
+      // Call API route to create user
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: createForm.email,
+          password: createForm.password,
+          role: createForm.role
+        })
       })
 
-      if (error) {
-        console.error('Error creating user:', error)
-        toast.error('Failed to create user: ' + error.message)
-        return
-      }
+      const data = await response.json()
 
-      // Create user profile with role
-      if (data.user) {
-        await supabase
-          .from('user_profiles')
-          .insert({
-            user_id: data.user.id,
-            role: createForm.role,
-            email: createForm.email
-          })
+      if (!response.ok) {
+        console.error('Error creating user:', data.error)
+        toast.error(data.error || 'Failed to create user')
+        return
       }
 
       setCreateModalOpen(false)
@@ -148,18 +134,22 @@ export default function UsersPage() {
 
     setIsSaving(true)
     try {
-      // Update user profile role
-      const { error } = await supabase
-        .from('user_profiles')
-        .upsert({
-          user_id: selectedUser.id,
-          role: editForm.role,
-          email: selectedUser.email
+      // Call API route to update user
+      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          role: editForm.role
         })
+      })
 
-      if (error) {
-        console.error('Error updating user:', error)
-        toast.error('Failed to update user')
+      const data = await response.json()
+
+      if (!response.ok) {
+        console.error('Error updating user:', data.error)
+        toast.error(data.error || 'Failed to update user')
         return
       }
 
@@ -179,20 +169,18 @@ export default function UsersPage() {
     if (!selectedUser) return
 
     try {
-      // Delete user via Supabase auth admin
-      const { error } = await supabase.auth.admin.deleteUser(selectedUser.id)
+      // Call API route to delete user
+      const response = await fetch(`/api/admin/users/${selectedUser.id}`, {
+        method: 'DELETE'
+      })
 
-      if (error) {
-        console.error('Error deleting user:', error)
-        toast.error('Failed to delete user: ' + error.message)
+      const data = await response.json()
+
+      if (!response.ok) {
+        console.error('Error deleting user:', data.error)
+        toast.error(data.error || 'Failed to delete user')
         return
       }
-
-      // Delete user profile
-      await supabase
-        .from('user_profiles')
-        .delete()
-        .eq('user_id', selectedUser.id)
 
       setDeleteDialogOpen(false)
       setSelectedUser(null)
