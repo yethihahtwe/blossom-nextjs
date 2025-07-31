@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getCategories, type Category } from '@/lib/categories'
-import { getAllNews } from '@/lib/news'
+import { newsService } from '@/lib/services/news.service'
+import { type News } from '@/lib/supabase'
 import { ImageUpload } from '@/components/ui/image-upload'
 import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
@@ -75,7 +75,7 @@ import {
   AlertTriangle,
   Loader2
 } from 'lucide-react'
-import { updateNews, createNews, deleteNews, type News } from '@/lib/news'
+import { StorageService } from '@/lib/storage'
 import { format } from 'date-fns'
 
 const ITEMS_PER_PAGE = 10
@@ -88,7 +88,7 @@ type DateRange = {
 
 export function NewsTable() {
   const [news, setNews] = useState<News[]>([])
-  const [categories, setCategories] = useState<Category[]>([])
+  const [categories, setCategories] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
@@ -130,7 +130,7 @@ export function NewsTable() {
   // Set default category when categories are loaded
   useEffect(() => {
     if (categories.length > 0 && !createForm.category) {
-      setCreateForm(prev => ({ ...prev, category: categories[0].name }))
+      setCreateForm(prev => ({ ...prev, category: categories[0] }))
     }
   }, [categories, createForm.category])
 
@@ -138,8 +138,8 @@ export function NewsTable() {
     async function fetchData() {
       try {
         const [newsData, categoriesData] = await Promise.all([
-          getAllNews(),
-          getCategories()
+          newsService.getAll(),
+          newsService.getCategories()
         ])
         setNews(newsData)
         setCategories(categoriesData)
@@ -162,10 +162,7 @@ export function NewsTable() {
     
     // Category filter
     const matchesCategory = selectedCategories.length === 0 || 
-      selectedCategories.some(categoryId => {
-        const category = categories.find(c => c.id === categoryId)
-        return category && article.category === category.name
-      })
+      selectedCategories.includes(article.category)
     
     // Date range filter
     const matchesDateRange = (!dateRange.from && !dateRange.to) || (() => {
@@ -187,11 +184,11 @@ export function NewsTable() {
   })
 
   // Filter helper functions
-  const handleCategoryToggle = (categoryId: string) => {
+  const handleCategoryToggle = (category: string) => {
     setSelectedCategories(prev => 
-      prev.includes(categoryId) 
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
+      prev.includes(category) 
+        ? prev.filter(cat => cat !== category)
+        : [...prev, category]
     )
     setCurrentPage(1) // Reset to first page when filtering
   }
@@ -237,7 +234,7 @@ export function NewsTable() {
     if (!selectedArticle) return
     
     try {
-      const success = await deleteNews(selectedArticle.id)
+      const success = await newsService.delete(selectedArticle.id)
       
       if (success) {
         // Remove from local state
@@ -246,22 +243,13 @@ export function NewsTable() {
         setSelectedArticle(null)
         
         // Show success message
-        toast.success('Article deleted successfully!', {
-          duration: 4000,
-          position: 'top-right',
-        })
+        toast.success('Article deleted successfully!')
       } else {
-        toast.error('Failed to delete article. Please try again.', {
-          duration: 4000,
-          position: 'top-right',
-        })
+        toast.error('Failed to delete article. Please try again.')
       }
     } catch (error) {
       console.error('Error deleting article:', error)
-      toast.error('An error occurred while deleting the article.', {
-        duration: 4000,
-        position: 'top-right',
-      })
+      toast.error('An error occurred while deleting the article.')
     }
   }
 
@@ -275,7 +263,7 @@ export function NewsTable() {
         ...editForm,
         published_at: editForm.published_at ? editForm.published_at.toISOString() : undefined
       }
-      const updatedNews = await updateNews(selectedArticle.id, updateData)
+      const updatedNews = await newsService.update(selectedArticle.id, updateData)
       
       if (updatedNews) {
         // Update local state with the updated article
@@ -287,23 +275,14 @@ export function NewsTable() {
         setSelectedArticle(null)
         
         // Show success message
-        toast.success('Article saved successfully!', {
-          duration: 4000,
-          position: 'top-right',
-        })
+        toast.success('Article saved successfully!')
       } else {
         console.error('Failed to update article')
-        toast.error('Failed to save article. Please try again.', {
-          duration: 4000,
-          position: 'top-right',
-        })
+        toast.error('Failed to save article. Please try again.')
       }
     } catch (error) {
       console.error('Error updating article:', error)
-      toast.error('An error occurred while saving the article.', {
-        duration: 4000,
-        position: 'top-right',
-      })
+      toast.error('An error occurred while saving the article.')
     } finally {
       setIsSaving(false)
     }
@@ -340,7 +319,7 @@ export function NewsTable() {
       }
       
       console.log('Creating news with data:', newsData)
-      const newNews = await createNews(newsData)
+      const newNews = await newsService.create(newsData)
       
       if (newNews) {
         // Add to local state
@@ -352,31 +331,44 @@ export function NewsTable() {
           content: '',
           excerpt: '',
           featured_image: '',
-          category: categories.length > 0 ? categories[0].name : '',
+          category: categories.length > 0 ? categories[0] : '',
           status: 'draft',
           published_at: undefined
         })
         
         // Show success message
-        toast.success('Article created successfully!', {
-          duration: 4000,
-          position: 'top-right',
-        })
+        toast.success('Article created successfully!')
       } else {
-        console.error('Failed to create article - createNews returned null')
-        toast.error('Failed to create article. Please try again.', {
-          duration: 4000,
-          position: 'top-right',
-        })
+        console.error('Failed to create article - newsService.create returned null')
+        toast.error('Failed to create article. Please try again.')
       }
     } catch (error) {
       console.error('Error creating article:', error)
-      toast.error('An error occurred while creating the article.', {
-        duration: 4000,
-        position: 'top-right',
-      })
+      toast.error('An error occurred while creating the article.')
     } finally {
       setIsSaving(false)
+    }
+  }
+
+  const handleImageUpload = async (file: File, isEdit: boolean = false) => {
+    try {
+      const imageUrl = await StorageService.uploadImage(file, 'news')
+      if (imageUrl) {
+        if (isEdit) {
+          setEditForm(prev => ({ ...prev, featured_image: imageUrl }))
+        } else {
+          setCreateForm(prev => ({ ...prev, featured_image: imageUrl }))
+        }
+        toast.success('Image uploaded successfully!')
+        return imageUrl
+      } else {
+        toast.error('Failed to upload image')
+        return null
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      toast.error('Failed to upload image')
+      return null
     }
   }
 
@@ -492,17 +484,17 @@ export function NewsTable() {
                       <h4 className="admin-font-medium text-gray-900 dark:text-white admin-text-base">Filter by Category</h4>
                       <div className="space-y-2">
                         {categories.map((category) => (
-                          <div key={category.id} className="flex items-center space-x-2">
+                          <div key={category} className="flex items-center space-x-2">
                             <Checkbox
-                              id={category.id}
-                              checked={selectedCategories.includes(category.id)}
-                              onCheckedChange={() => handleCategoryToggle(category.id)}
+                              id={category}
+                              checked={selectedCategories.includes(category)}
+                              onCheckedChange={() => handleCategoryToggle(category)}
                             />
                             <Label 
-                              htmlFor={category.id}
+                              htmlFor={category}
                               className="admin-text-sm text-gray-700 dark:text-gray-300 cursor-pointer admin-font-normal"
                             >
-                              {category.name}
+                              {category}
                             </Label>
                           </div>
                         ))}
@@ -579,20 +571,17 @@ export function NewsTable() {
                         <X className="ml-1 h-3 w-3 group-hover:text-blue-900 dark:group-hover:text-blue-100 transition-colors" />
                       </Badge>
                     )}
-                    {selectedCategories.map(categoryId => {
-                      const category = categories.find(c => c.id === categoryId)
-                      return (
+                    {selectedCategories.map(category => (
                         <Badge 
-                          key={categoryId} 
+                          key={category} 
                           variant="secondary" 
                           className="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-700 admin-panel admin-font-medium hover:bg-green-200 dark:hover:bg-green-800 transition-colors cursor-pointer group"
-                          onClick={() => handleCategoryToggle(categoryId)}
+                          onClick={() => handleCategoryToggle(category)}
                         >
-                          <span className="text-xs">{category?.name}</span>
+                          <span className="text-xs">{category}</span>
                           <X className="ml-1 h-3 w-3 group-hover:text-green-900 dark:group-hover:text-green-100 transition-colors" />
                         </Badge>
-                      )
-                    })}
+                      ))}
                     {(dateRange.from || dateRange.to) && (
                       <Badge 
                         variant="secondary" 
@@ -893,6 +882,7 @@ export function NewsTable() {
               label="Featured Image (Optional)"
               value={editForm.featured_image}
               onChange={(url) => setEditForm(prev => ({ ...prev, featured_image: url }))}
+              onUpload={(file) => handleImageUpload(file, true)}
               className="admin-panel"
             />
             
@@ -922,8 +912,8 @@ export function NewsTable() {
                   className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
                 >
                   {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
+                    <option key={category} value={category}>
+                      {category}
                     </option>
                   ))}
                 </select>
@@ -1057,6 +1047,7 @@ export function NewsTable() {
               label="Featured Image (Optional)"
               value={createForm.featured_image}
               onChange={(url) => setCreateForm(prev => ({ ...prev, featured_image: url }))}
+              onUpload={(file) => handleImageUpload(file, false)}
               className="admin-panel"
             />
             
@@ -1086,8 +1077,8 @@ export function NewsTable() {
                   className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
                 >
                   {categories.map((category) => (
-                    <option key={category.id} value={category.name}>
-                      {category.name}
+                    <option key={category} value={category}>
+                      {category}
                     </option>
                   ))}
                 </select>

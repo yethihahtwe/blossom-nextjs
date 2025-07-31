@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Settings } from 'lucide-react'
 import { CategoriesManagement } from '@/components/admin/categories-management'
+import { BackupExportSettings } from '@/components/admin/backup-export-settings'
 
 export default function AdminSettingsPage() {
   return (
@@ -20,14 +21,16 @@ export default function AdminSettingsPage() {
         </CardContent>
       </Card>
 
-      {/* General Settings Placeholder */}
+      {/* Backup & Export Settings */}
       <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-        <CardContent className="text-center py-12">
-          <Settings className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">General Settings</h3>
-          <p className="text-gray-600 dark:text-gray-300">
-            Additional settings will be implemented here.
-          </p>
+        <CardHeader>
+          <CardTitle className="text-gray-900 dark:text-white flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Backup & Export Settings
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <BackupExportSettings />
         </CardContent>
       </Card>
     </div>
