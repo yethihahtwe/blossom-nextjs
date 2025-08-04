@@ -4,36 +4,28 @@ import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { RefreshCw, Database, Eye, TrendingUp } from 'lucide-react'
-import { getViewStats, getTopContent, getRecentViewTrends } from '@/lib/analytics'
-import { getPublishedNews } from '@/lib/news'
-import { getPublishedAnnouncements } from '@/lib/announcements'
+import { RefreshCw } from 'lucide-react'
+import { getViewStats, getTopContent } from '@/lib/analytics'
 
 export default function AnalyticsPage() {
-  const [viewStats, setViewStats] = useState<any>(null)
-  const [topContent, setTopContent] = useState<any[]>([])
-  const [recentTrends, setRecentTrends] = useState<any[]>([])
-  const [testResults, setTestResults] = useState<any[]>([])
+  const [viewStats, setViewStats] = useState<unknown>(null)
+  const [topContent, setTopContent] = useState<unknown[]>([])
+  // const [recentTrends, setRecentTrends] = useState<any[]>([])
+  // const [testResults, setTestResults] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [news, setNews] = useState<any[]>([])
-  const [announcements, setAnnouncements] = useState<any[]>([])
+  // const [news, setNews] = useState<any[]>([])
+  // const [announcements, setAnnouncements] = useState<any[]>([])
 
   const loadData = async () => {
     setLoading(true)
     try {
-      const [statsData, topData, trendsData, newsData, announcementsData] = await Promise.all([
+      const [statsData, topData] = await Promise.all([
         getViewStats(),
-        getTopContent(5),
-        getRecentViewTrends(),
-        getPublishedNews(),
-        getPublishedAnnouncements()
+        getTopContent(5)
       ])
       
       setViewStats(statsData)
       setTopContent(topData)
-      setRecentTrends(trendsData)
-      setNews(newsData)
-      setAnnouncements(announcementsData)
     } catch (error) {
       console.error('Error loading analytics:', error)
     } finally {
@@ -41,79 +33,23 @@ export default function AnalyticsPage() {
     }
   }
 
-  const testViewTracking = async () => {
-    if (news.length === 0 && announcements.length === 0) {
-      alert('No content available to test with!')
-      return
-    }
+  // const testViewTracking = async () => {
+  //   if (news.length === 0 && announcements.length === 0) {
+  //     alert('No content available to test with!')
+  //     return
+  //   }
+  //   // ... implementation
+  // }
 
-    const results = []
-    
-    // Test with first news article if available
-    if (news.length > 0) {
-      try {
-        const response = await fetch('/api/track-view', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'news', id: news[0].id })
-        })
-        const result = await response.json()
-        results.push({
-          type: 'News',
-          title: news[0].title,
-          success: response.ok,
-          result: result
-        })
-      } catch (error) {
-        results.push({
-          type: 'News',
-          title: news[0].title,
-          success: false,
-          error: error.message
-        })
-      }
-    }
-
-    // Test with first announcement if available
-    if (announcements.length > 0) {
-      try {
-        const response = await fetch('/api/track-view', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ type: 'announcement', id: announcements[0].id })
-        })
-        const result = await response.json()
-        results.push({
-          type: 'Announcement',
-          title: announcements[0].title,
-          success: response.ok,
-          result: result
-        })
-      } catch (error) {
-        results.push({
-          type: 'Announcement',
-          title: announcements[0].title,
-          success: false,
-          error: error.message
-        })
-      }
-    }
-
-    setTestResults(results)
-    
-    // Reload analytics after testing
-    setTimeout(loadData, 1000)
-  }
-
-  const testHealthCheck = async () => {
-    try {
-      const response = await fetch('/api/track-view')
-      const result = await response.json()
-      alert(`Health Check: ${result.status} - ${result.message || 'Success'}`)
-    } catch (error) {
-      alert(`Health Check Failed: ${error.message}`)
-    }
-  }
+  // const testHealthCheck = async () => {
+  //   try {
+  //     const response = await fetch('/api/track-view')
+  //     const result = await response.json()
+  //     alert(`Health Check: ${result.status} - ${result.message || 'Success'}`)
+  //   } catch (error) {
+  //     alert(`Health Check Failed: ${error.message}`)
+  //   }
+  // }
 
   useEffect(() => {
     loadData()
@@ -210,7 +146,7 @@ export default function AnalyticsPage() {
         <CardContent>
           {topContent.length > 0 ? (
             <div className="space-y-3">
-              {topContent.map((item, index) => (
+              {topContent.map((item) => (
                 <div key={`${item.type}-${item.id}`} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">{item.title}</p>

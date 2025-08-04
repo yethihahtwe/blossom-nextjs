@@ -98,7 +98,7 @@ export function AdminSidebar() {
             const isActive = pathname === item.href
             const isLoading = loadingHref === item.href
             
-            const handleClick = (e: React.MouseEvent) => {
+            const handleClick = () => {
               if (isActive) return // Don't show loading for current page
               
               setLoadingHref(item.href)

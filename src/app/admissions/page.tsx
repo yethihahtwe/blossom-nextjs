@@ -80,7 +80,7 @@ export default function AdmissionsPage() {
                       </li>
                       <li className="flex items-start">
                         <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0" style={{backgroundColor: '#791218'}}></span>
-                        Student's birth certificate
+                        Student&apos;s birth certificate
                       </li>
                       <li className="flex items-start">
                         <span className="w-2 h-2 rounded-full mt-2 mr-3 flex-shrink-0" style={{backgroundColor: '#791218'}}></span>

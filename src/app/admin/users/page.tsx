@@ -25,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Search, Plus, Edit, Trash2, MoreHorizontal, AlertTriangle, Mail, Shield, User as UserIcon, X } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, MoreHorizontal, AlertTriangle, User as UserIcon, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface AdminUser extends User {

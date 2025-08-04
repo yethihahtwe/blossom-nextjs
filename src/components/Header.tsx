@@ -81,7 +81,7 @@ interface NavLinkProps {
   currentPath: string;
   loadingHref: string | null;
   setLoadingHref: (href: string | null) => void;
-  router: any;
+  router: ReturnType<typeof useRouter>;
   children: React.ReactNode;
 }
 

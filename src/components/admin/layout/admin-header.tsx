@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bell, Search, LogOut, ExternalLink, X, Check, Trash2 } from 'lucide-react'
+import { Bell, Search, LogOut, ExternalLink, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -18,14 +18,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOut } from '@/lib/auth'
 import { DarkModeToggle } from '@/components/admin/dark-mode-toggle'
 import { SearchResults } from '@/components/admin/search-results'
 import { useAdminSearch } from '@/hooks/useAdminSearch'
-import { notificationsService } from '@/lib/services/notifications.service'
+// import { notificationsService } from '@/lib/services/notifications.service'
 import type { Notification } from '@/lib/types/notification'
 import { montserrat } from '@/app/admin/font'
 
@@ -46,7 +45,7 @@ export function AdminHeader() {
     searchQuery,
     searchResults,
     isOpen,
-    loading,
+    // loading,
     handleSearch,
     clearSearch,
     setIsOpen

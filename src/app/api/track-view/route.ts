@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   try {
     // Simple query to keep database active
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('news')
       .select('count')
       .limit(1)

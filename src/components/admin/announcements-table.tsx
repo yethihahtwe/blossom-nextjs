@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, ViewPage } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, ViewPage } from '@/components/ui/dialog'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -296,11 +296,11 @@ export function AnnouncementsTable() {
   }
 
   const getPriorityBadge = (priority: Priority) => {
-    const variants = {
-      urgent: 'destructive',
-      important: 'default',
-      normal: 'secondary'
-    } as const
+    // const variants = {
+    //   urgent: 'destructive',
+    //   important: 'default',
+    //   normal: 'secondary'
+    // } as const
     
     const colors = {
       urgent: 'bg-red-100 text-red-800 hover:bg-red-100',

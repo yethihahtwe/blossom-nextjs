@@ -10,7 +10,6 @@ import {
   Download, 
   Database, 
   FileText, 
-  Image, 
   Calendar,
   CheckCircle,
   AlertCircle,
@@ -35,9 +34,9 @@ export function BackupExportSettings() {
     setExportProgress({ step: 'Initializing...', progress: 0, total: 100, isComplete: false })
 
     try {
-      let data: any = {}
+      let data: unknown = {}
       let filename = ''
-      let totalSteps = 1
+      // let totalSteps = 1
 
       switch (type) {
         case 'news':
@@ -55,7 +54,7 @@ export function BackupExportSettings() {
           break
 
         case 'all':
-          totalSteps = 2
+          // totalSteps = 2
           setExportProgress({ step: 'Exporting news articles...', progress: 25, total: 100, isComplete: false })
           const { data: allNewsData } = await supabase.from('news').select('*').order('created_at', { ascending: false })
           
@@ -70,7 +69,7 @@ export function BackupExportSettings() {
           break
 
         case 'full-backup':
-          totalSteps = 4
+          // totalSteps = 4
           setExportProgress({ step: 'Exporting news articles...', progress: 20, total: 100, isComplete: false })
           const { data: backupNewsData } = await supabase.from('news').select('*').order('created_at', { ascending: false })
           
@@ -143,7 +142,7 @@ export function BackupExportSettings() {
         announcements: announcementsCount.count || 0,
         categories: categoriesCount.count || 0
       }
-    } catch (error) {
+    } catch {
       return { news: 0, announcements: 0, categories: 0 }
     }
   }

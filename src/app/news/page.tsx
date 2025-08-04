@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { getPublishedNews, getNewsCategories, searchNews, getNewsByCategory } from '@/lib/news';
 import { type News } from '@/lib/supabase';
 import NewsCard from '@/components/NewsCard';
@@ -109,7 +109,7 @@ export default function NewsPage() {
                 School News
               </h1>
               <p className="text-xl text-gray-200 max-w-3xl mx-auto mb-8">
-                Stay updated with the latest news and events at Blossom International School. From academic achievements to school announcements, discover what's happening in our vibrant school community.
+                Stay updated with the latest news and events at Blossom International School. From academic achievements to school announcements, discover what&apos;s happening in our vibrant school community.
               </p>
               
               {/* Search Field */}
