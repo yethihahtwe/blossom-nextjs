@@ -1,6 +1,7 @@
 ## Instruction
 - Always read TODO.md and check when a task is done
 - Add every new task under TODO first then implement and check when done
+- Use serena mcp always
 
 ## Project Overview
 - Creating a public-facing website for a private school
