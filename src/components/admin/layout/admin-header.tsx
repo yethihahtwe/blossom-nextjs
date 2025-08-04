@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bell, Search, LogOut, ExternalLink, X, Check } from 'lucide-react'
+import { Bell, Search, LogOut, ExternalLink, X, Check, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -27,6 +27,7 @@ import { SearchResults } from '@/components/admin/search-results'
 import { useAdminSearch } from '@/hooks/useAdminSearch'
 import { notificationsService } from '@/lib/services/notifications.service'
 import type { Notification } from '@/lib/types/notification'
+import { montserrat } from '@/app/admin/font'
 
 export function AdminHeader() {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
@@ -35,6 +36,8 @@ export function AdminHeader() {
   const [unreadCount, setUnreadCount] = useState(0)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [loadingNotifications, setLoadingNotifications] = useState(false)
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null)
+  const [showNotificationDetail, setShowNotificationDetail] = useState(false)
   const router = useRouter()
   const searchRef = useRef<HTMLDivElement>(null)
   
@@ -63,11 +66,22 @@ export function AdminHeader() {
     }
   }, [setIsOpen])
 
-  // Load notifications on component mount
+  // Load notifications on component mount and set up polling
   useEffect(() => {
     loadNotifications()
     loadUnreadCount()
-  }, [])
+    
+    // Poll for new notifications every 30 seconds
+    const interval = setInterval(() => {
+      loadUnreadCount()
+      // Only reload notifications if dropdown is not open to avoid disrupting user
+      if (!notificationsOpen) {
+        loadNotifications()
+      }
+    }, 30000)
+    
+    return () => clearInterval(interval)
+  }, [notificationsOpen])
 
   const loadNotifications = async () => {
     try {
@@ -224,7 +238,7 @@ export function AdminHeader() {
                 )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg">
+            <DropdownMenuContent align="end" className={`w-80 max-h-96 overflow-y-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-lg ${montserrat.className}`}>
               <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-sm text-gray-900 dark:text-white">Notifications</h3>
                 {unreadCount > 0 && (
@@ -311,15 +325,21 @@ export function AdminHeader() {
             <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
               <DialogTrigger asChild>
                 <Button 
-                  variant="ghost" 
-                  size="icon"
+                  variant="outline" 
+                  size="sm"
                   disabled={isLoggingOut}
-                  title="Sign out"
+                  className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white px-3 py-2"
                 >
                   {isLoggingOut ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 dark:border-gray-400"></div>
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 dark:border-gray-400 mr-2"></div>
+                      Signing out...
+                    </>
                   ) : (
-                    <LogOut className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                    <>
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign out
+                    </>
                   )}
                 </Button>
               </DialogTrigger>

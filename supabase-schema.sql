@@ -270,5 +270,7 @@ ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Authenticated users can manage notifications" ON notifications
   FOR ALL USING (auth.uid() IS NOT NULL);
 
+-- Note: Use service role key for admin operations to bypass RLS securely
+
 -- Note: For admin operations (create, update, delete), you'll need to set up authentication
 -- and create appropriate policies for authenticated users with admin roles

@@ -101,7 +101,8 @@ export async function POST(request: NextRequest) {
 
     // Create notification for admin panel
     try {
-      await notificationsService.create({
+      console.log('Attempting to create notification...')
+      const notification = await notificationsService.createServerSide({
         title: `New Contact Form Submission from ${first_name} ${last_name}`,
         message: `Contact request from ${first_name} ${last_name} (${email}) for ${grade_level} program. Phone: ${phone}`,
         type: 'contact_form',
@@ -115,6 +116,7 @@ export async function POST(request: NextRequest) {
           submitted_at: new Date().toISOString()
         }
       })
+      console.log('Notification created successfully:', notification)
     } catch (notificationError) {
       console.error('Failed to create notification:', notificationError)
       // Don't fail the entire request if notification creation fails

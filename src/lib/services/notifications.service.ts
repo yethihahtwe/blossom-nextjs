@@ -3,6 +3,7 @@ import type { Notification, CreateNotificationData, UpdateNotificationData } fro
 
 export class NotificationsService {
   static async getAll(): Promise<Notification[]> {
+    console.log('NotificationsService.getAll() called')
     const { data, error } = await supabase
       .from('notifications')
       .select('*')
@@ -13,6 +14,7 @@ export class NotificationsService {
       throw error
     }
 
+    console.log('getAll returned:', data?.length || 0, 'notifications')
     return data || []
   }
 
@@ -32,6 +34,7 @@ export class NotificationsService {
   }
 
   static async getUnreadCount(): Promise<number> {
+    console.log('NotificationsService.getUnreadCount() called')
     const { count, error } = await supabase
       .from('notifications')
       .select('*', { count: 'exact', head: true })
@@ -42,6 +45,7 @@ export class NotificationsService {
       throw error
     }
 
+    console.log('getUnreadCount returned:', count || 0)
     return count || 0
   }
 
@@ -63,6 +67,101 @@ export class NotificationsService {
     }
 
     return data
+  }
+
+  // Server-side method for creating notifications (bypasses RLS)
+  static async createServerSide(notificationData: CreateNotificationData): Promise<Notification | null> {
+    // Dynamic import to avoid client-side bundle issues
+    const { createClient } = await import('@supabase/supabase-js')
+    
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+
+    const { data, error } = await supabaseAdmin
+      .from('notifications')
+      .insert([{
+        ...notificationData,
+        type: notificationData.type || 'info',
+        priority: notificationData.priority || 'normal',
+        metadata: notificationData.metadata || {}
+      }])
+      .select()
+      .single()
+
+    if (error) {
+      console.error('Error creating notification:', error)
+      throw error
+    }
+
+    return data
+  }
+
+  // Server-side method for getting all notifications (bypasses RLS)
+  static async getAllServerSide(): Promise<Notification[]> {
+    console.log('NotificationsService.getAllServerSide() called')
+    const { createClient } = await import('@supabase/supabase-js')
+    
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+
+    const { data, error } = await supabaseAdmin
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching notifications:', error)
+      throw error
+    }
+
+    console.log('getAllServerSide returned:', data?.length || 0, 'notifications')
+    return data || []
+  }
+
+  // Server-side method for getting unread count (bypasses RLS)
+  static async getUnreadCountServerSide(): Promise<number> {
+    console.log('NotificationsService.getUnreadCountServerSide() called')
+    const { createClient } = await import('@supabase/supabase-js')
+    
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+
+    const { count, error } = await supabaseAdmin
+      .from('notifications')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_read', false)
+
+    if (error) {
+      console.error('Error fetching unread count:', error)
+      throw error
+    }
+
+    console.log('getUnreadCountServerSide returned:', count || 0)
+    return count || 0
   }
 
   static async markAsRead(id: string): Promise<boolean> {
