@@ -49,6 +49,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  ViewPage,
 } from '@/components/ui/dialog'
 import {
   AlertDialog,
@@ -760,84 +761,27 @@ export function NewsTable() {
       )}
 
       {/* View Modal */}
-      <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
-        <DialogContent className="max-w-7xl w-[90vw] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white admin-panel">
-              View Article
-            </DialogTitle>
-            <DialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
-              Full details of the selected news article.
-            </DialogDescription>
-          </DialogHeader>
-          {selectedArticle && (
-            <div className="space-y-6 admin-panel">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Title</h3>
-                <p className="text-gray-700 dark:text-gray-300">{selectedArticle.title}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Excerpt</h3>
-                <p className="text-gray-700 dark:text-gray-300">{selectedArticle.excerpt || 'No excerpt available.'}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Content</h3>
-                <div 
-                  className="prose dark:prose-invert max-w-none text-gray-700 dark:text-white dark:bg-white px-4 py-4 rounded-lg"
-                  dangerouslySetInnerHTML={{ __html: selectedArticle.content }}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Status</h3>
-                  <div>{getStatusBadge(selectedArticle.status)}</div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Views</h3>
-                  <p className="text-gray-700 dark:text-gray-300">{selectedArticle.view_count || 0}</p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Published Date</h3>
-                  <p className="text-gray-700 dark:text-gray-300">{formatDate(selectedArticle.published_at)}</p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Last Updated</h3>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {selectedArticle.updated_at ? formatDate(selectedArticle.updated_at) : 'Never'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setViewModalOpen(false)}
-              className="admin-panel"
-            >
-              Close
-            </Button>
-            {selectedArticle && (
-              <Button 
-                onClick={() => {
-                  setViewModalOpen(false)
-                  handleEdit(selectedArticle)
-                }}
-                className="bg-blue-600 hover:bg-blue-700 text-white admin-panel"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Article
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {selectedArticle && (
+        <ViewPage
+          title="View Article"
+          description="Full details of the selected news article."
+          isOpen={viewModalOpen}
+          onClose={() => setViewModalOpen(false)}
+          data={{
+            title: selectedArticle.title,
+            excerpt: selectedArticle.excerpt,
+            content: selectedArticle.content,
+            status: selectedArticle.status,
+            published_at: selectedArticle.published_at,
+            updated_at: selectedArticle.updated_at,
+            view_count: selectedArticle.view_count,
+            category: selectedArticle.category
+          }}
+          onEdit={() => handleEdit(selectedArticle)}
+          getStatusBadge={getStatusBadge}
+          formatDate={formatDate}
+        />
+      )}
 
       {/* Edit Modal */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>

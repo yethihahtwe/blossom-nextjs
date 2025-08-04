@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
@@ -13,6 +13,7 @@ import {
   BarChart3,
   ChevronLeft,
   ChevronRight,
+  Loader2,
 } from 'lucide-react'
 
 const navigation = [
@@ -50,7 +51,14 @@ const navigation = [
 
 export function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false)
+  const [loadingHref, setLoadingHref] = useState<string | null>(null)
   const pathname = usePathname()
+  const router = useRouter()
+
+  // Clear loading state when pathname changes
+  useEffect(() => {
+    setLoadingHref(null)
+  }, [pathname])
 
   return (
     <div
@@ -88,12 +96,24 @@ export function AdminSidebar() {
         <nav className="flex-1 space-y-1 p-4">
           {navigation.map((item) => {
             const isActive = pathname === item.href
+            const isLoading = loadingHref === item.href
+            
+            const handleClick = (e: React.MouseEvent) => {
+              if (isActive) return // Don't show loading for current page
+              
+              setLoadingHref(item.href)
+              // Let Next.js handle the navigation
+              setTimeout(() => {
+                router.push(item.href)
+              }, 0)
+            }
+            
             return (
-              <Link
+              <button
                 key={item.name}
-                href={item.href}
+                onClick={handleClick}
                 className={cn(
-                  'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                  'w-full flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
                   isActive
                     ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-r-2 border-red-600'
                     : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white'
@@ -105,8 +125,15 @@ export function AdminSidebar() {
                     collapsed ? 'mr-0' : 'mr-3'
                   )}
                 />
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
+                {!collapsed && (
+                  <div className="flex items-center justify-between w-full">
+                    <span>{item.name}</span>
+                    {isLoading && (
+                      <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+                    )}
+                  </div>
+                )}
+              </button>
             )
           })}
         </nav>

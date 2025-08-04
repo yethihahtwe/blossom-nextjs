@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { User } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
@@ -24,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Search, Plus, Edit, Trash2, MoreHorizontal, AlertTriangle, Mail, Shield, User as UserIcon } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, MoreHorizontal, AlertTriangle, Mail, Shield, User as UserIcon, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface AdminUser extends User {
@@ -261,68 +262,106 @@ export default function UsersPage() {
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border p-4">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search users..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+      {/* Search and Filter Section */}
+      <div className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-600 p-6 space-y-4">
+        {/* Search Row */}
+        <div className="flex items-center justify-between gap-4">
+          {/* Search on the left */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
+            <Input
+              placeholder="Search users..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 admin-panel"
+            />
+          </div>
+        </div>
+
+        {/* Active Filters Section - Always Reserved Space */}
+        <div className="min-h-[2.5rem] flex items-center">
+          {searchQuery ? (
+            <div className="flex items-center gap-2 flex-wrap w-full">
+              <span className="text-sm text-gray-600 dark:text-gray-400 font-medium flex-shrink-0">Active filters:</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge 
+                  variant="secondary" 
+                  className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-700 admin-panel font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors cursor-pointer group"
+                  onClick={() => setSearchQuery('')}
+                >
+                  <span className="text-xs">Search: {searchQuery}</span>
+                  <X className="ml-1 h-3 w-3 group-hover:text-blue-900 dark:group-hover:text-blue-100 transition-colors" />
+                </Badge>
+              </div>
+            </div>
+          ) : (
+            <div className="w-full h-10 flex items-center">
+              <span className="text-sm text-gray-400 dark:text-gray-500 font-normal italic">No active filters</span>
+            </div>
+          )}
         </div>
       </div>
 
       {/* Users Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Last Sign In</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+      <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-200 dark:border-gray-600">
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-6">User</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Role</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Last Sign In</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Created</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
           <TableBody>
             {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell>
+              <TableRow key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                <TableCell className="font-medium py-4 px-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                      <UserIcon className="h-4 w-4 text-gray-600" />
+                    <div className="w-8 h-8 bg-gray-100 dark:bg-gray-600 rounded-full flex items-center justify-center">
+                      <UserIcon className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                     </div>
                     <div>
-                      <div className="font-medium">{user.email}</div>
-                      <div className="text-sm text-gray-500">ID: {user.id}</div>
+                      <div className="text-gray-900 dark:text-white font-semibold">{user.email}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">ID: {user.id}</div>
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>{getRoleBadge(user.role || 'viewer')}</TableCell>
-                <TableCell>{formatDate(user.last_sign_in_at)}</TableCell>
-                <TableCell>{formatDate(user.created_at)}</TableCell>
-                <TableCell className="text-right">
+                <TableCell className="py-4 px-4">{getRoleBadge(user.role || 'viewer')}</TableCell>
+                <TableCell className="text-gray-600 dark:text-gray-300 py-4 px-4">{formatDate(user.last_sign_in_at)}</TableCell>
+                <TableCell className="text-gray-600 dark:text-gray-300 py-4 px-4">{formatDate(user.created_at)}</TableCell>
+                <TableCell className="text-right py-4 px-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button 
+                        variant="ghost" 
+                        className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-600 admin-panel transition-colors"
+                      >
                         <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
+                        <MoreHorizontal className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleEdit(user)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit Role
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 admin-panel shadow-lg"
+                      data-admin-panel
+                    >
                       <DropdownMenuItem 
-                        className="text-red-600"
+                        className="text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 admin-panel cursor-pointer transition-colors font-medium"
+                        onClick={() => handleEdit(user)}
+                      >
+                        <Edit className="mr-2 h-4 w-4 text-green-600 dark:text-green-400" />
+                        <span className="text-sm">Edit Role</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator className="bg-gray-200 dark:bg-gray-600" />
+                      <DropdownMenuItem 
+                        className="text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 admin-panel cursor-pointer transition-colors font-medium"
                         onClick={() => handleDelete(user)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
-                        Delete User
+                        <span className="text-sm">Delete User</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -331,51 +370,61 @@ export default function UsersPage() {
             ))}
           </TableBody>
         </Table>
+        </CardContent>
+      </Card>
 
-        {filteredUsers.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No users found.</p>
-          </div>
-        )}
-      </div>
+      {/* Empty State */}
+      {filteredUsers.length === 0 && (
+        <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <CardContent className="text-center py-12">
+            <UserIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No users found</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              {searchQuery ? 'Try adjusting your search terms.' : 'Get started by adding your first admin user.'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Create User Modal */}
       <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
           <DialogHeader>
-            <DialogTitle>Add New User</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white admin-panel">Add New User</DialogTitle>
+            <DialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
               Create a new admin panel user account with assigned role.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 admin-panel">
             <div>
-              <label className="block text-sm font-medium mb-2">Email *</label>
+              <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Email *</label>
               <Input
                 type="email"
                 value={createForm.email}
                 onChange={(e) => setCreateForm(prev => ({ ...prev, email: e.target.value }))}
                 placeholder="user@example.com"
+                className="admin-panel"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Password *</label>
+              <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Password *</label>
               <Input
                 type="password"
                 value={createForm.password}
                 onChange={(e) => setCreateForm(prev => ({ ...prev, password: e.target.value }))}
                 placeholder="Enter password"
+                className="admin-panel"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Role</label>
+              <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Role</label>
               <select
                 value={createForm.role}
                 onChange={(e) => setCreateForm(prev => ({ ...prev, role: e.target.value as 'admin' | 'editor' | 'viewer' }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-700"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
               >
                 <option value="viewer">Viewer - Read only access</option>
                 <option value="editor">Editor - Can create and edit content</option>
@@ -384,18 +433,19 @@ export default function UsersPage() {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
               onClick={() => setCreateModalOpen(false)}
               disabled={isSaving}
+              className="admin-panel disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </Button>
             <Button
               onClick={handleCreateUser}
               disabled={isSaving}
-              className="bg-green-600 hover:bg-green-700 text-white"
+              className="bg-green-600 hover:bg-green-700 text-white admin-panel disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? 'Creating...' : 'Create User'}
             </Button>
@@ -405,21 +455,21 @@ export default function UsersPage() {
 
       {/* Edit User Modal */}
       <Dialog open={editModalOpen} onOpenChange={setEditModalOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
           <DialogHeader>
-            <DialogTitle>Edit User Role</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white admin-panel">Edit User Role</DialogTitle>
+            <DialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
               Update the role and permissions for {selectedUser?.email}
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-4 admin-panel">
             <div>
-              <label className="block text-sm font-medium mb-2">Role</label>
+              <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Role</label>
               <select
                 value={editForm.role}
                 onChange={(e) => setEditForm(prev => ({ ...prev, role: e.target.value as 'admin' | 'editor' | 'viewer' }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md dark:border-gray-600 dark:bg-gray-700"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
               >
                 <option value="viewer">Viewer - Read only access</option>
                 <option value="editor">Editor - Can create and edit content</option>
@@ -428,18 +478,19 @@ export default function UsersPage() {
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button
               variant="outline"
               onClick={() => setEditModalOpen(false)}
               disabled={isSaving}
+              className="admin-panel disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </Button>
             <Button
               onClick={handleUpdateUser}
               disabled={isSaving}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="bg-blue-600 hover:bg-blue-700 text-white admin-panel disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? 'Updating...' : 'Update Role'}
             </Button>
@@ -449,21 +500,23 @@ export default function UsersPage() {
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
           <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2 text-red-600">
+            <AlertDialogTitle className="flex items-center gap-2 text-red-600 dark:text-red-400 admin-panel">
               <AlertTriangle className="h-5 w-5" />
               Delete User
             </AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
               Are you sure you want to delete {selectedUser?.email}? This action cannot be undone and will permanently remove their access to the admin panel.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogFooter className="gap-2">
+            <AlertDialogCancel className="admin-panel">
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDeleteUser}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 hover:bg-red-700 text-white admin-panel"
             >
               <Trash2 className="h-4 w-4 mr-2" />
               Delete User

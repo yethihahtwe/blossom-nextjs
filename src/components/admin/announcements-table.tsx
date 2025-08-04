@@ -10,10 +10,18 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, ViewPage } from '@/components/ui/dialog'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination'
 import { Badge } from '@/components/ui/badge'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { Editor } from '@/components/ui/editor'
@@ -531,41 +539,42 @@ export function AnnouncementsTable() {
       </div>
 
       {/* Announcements Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg border overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Published Date</TableHead>
-              <TableHead>Created</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+      <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-gray-100 dark:bg-gray-700 border-b-2 border-gray-200 dark:border-gray-600">
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-6">Title</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Priority</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Status</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Published Date</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4">Created</TableHead>
+                <TableHead className="text-gray-900 dark:text-white font-bold py-4 px-4 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
           <TableBody>
             {paginatedAnnouncements.map((announcement) => (
-              <TableRow key={announcement.id}>
-                <TableCell>
-                  <div>
-                    <div className="font-medium">{announcement.title}</div>
-                    <div className="text-sm text-gray-500 truncate max-w-xs">
+              <TableRow key={announcement.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30">
+                <TableCell className="font-medium py-4 px-6">
+                  <div className="max-w-md">
+                    <h4 className="text-gray-900 dark:text-white font-semibold truncate">{announcement.title}</h4>
+                    <p className="text-gray-600 dark:text-gray-300 text-sm truncate mt-1">
                       {announcement.excerpt}
-                    </div>
+                    </p>
                   </div>
                 </TableCell>
-                <TableCell>{getPriorityBadge(announcement.priority)}</TableCell>
-                <TableCell>{getStatusBadge(announcement.status)}</TableCell>
-                <TableCell>
+                <TableCell className="py-4 px-4">{getPriorityBadge(announcement.priority)}</TableCell>
+                <TableCell className="py-4 px-4">{getStatusBadge(announcement.status)}</TableCell>
+                <TableCell className="text-gray-600 dark:text-gray-300 py-4 px-4">
                   {announcement.published_at 
                     ? DateFormatter.formatDate(announcement.published_at)
                     : '-'
                   }
                 </TableCell>
-                <TableCell>
+                <TableCell className="text-gray-600 dark:text-gray-300 py-4 px-4">
                   {DateFormatter.formatDate(announcement.created_at)}
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell className="text-right py-4 px-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button 
@@ -611,45 +620,39 @@ export function AnnouncementsTable() {
           </TableBody>
         </Table>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/20">
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, filteredAnnouncements.length)} of {filteredAnnouncements.length} results
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="admin-panel"
-              >
-                Previous
-              </Button>
-              
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <Button
-                  key={page}
-                  variant={currentPage === page ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setCurrentPage(page)}
-                  className={`admin-panel ${currentPage === page ? 'bg-red-600 hover:bg-red-700 text-white' : ''}`}
-                >
-                  {page}
-                </Button>
-              ))}
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="admin-panel"
-              >
-                Next
-              </Button>
-            </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-700/20">
+              <div className="text-sm text-gray-600 dark:text-gray-400">
+                Showing {startIndex + 1} to {Math.min(startIndex + ITEMS_PER_PAGE, filteredAnnouncements.length)} of {filteredAnnouncements.length} results
+              </div>
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        onClick={() => setCurrentPage(page)}
+                        isActive={currentPage === page}
+                        className="cursor-pointer"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
           </div>
         )}
 
@@ -662,12 +665,21 @@ export function AnnouncementsTable() {
           </div>
         )}
 
-        {filteredAnnouncements.length === 0 && (
-          <div className="text-center py-8">
-            <p className="text-gray-500">No announcements found.</p>
-          </div>
-        )}
-      </div>
+        </CardContent>
+      </Card>
+
+      {/* Empty State */}
+      {filteredAnnouncements.length === 0 && (
+        <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
+          <CardContent className="text-center py-12">
+            <AlertTriangle className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No announcements found</h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              {searchQuery || priorityFilter || statusFilter ? 'Try adjusting your search terms or filters.' : 'Get started by creating your first announcement.'}
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Create Modal */}
       <Dialog open={createModalOpen} onOpenChange={setCreateModalOpen}>
@@ -956,100 +968,26 @@ export function AnnouncementsTable() {
       </Dialog>
 
       {/* View Modal */}
-      <Dialog open={viewModalOpen} onOpenChange={setViewModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800 admin-panel" data-admin-panel>
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white admin-panel">
-              View Announcement
-            </DialogTitle>
-            <DialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
-              Full details of the selected announcement.
-            </DialogDescription>
-          </DialogHeader>
-          {selectedAnnouncement && (
-            <div className="space-y-6 admin-panel">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Title</h3>
-                <p className="text-gray-700 dark:text-gray-300">{selectedAnnouncement.title}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Excerpt</h3>
-                <p className="text-gray-700 dark:text-gray-300">{selectedAnnouncement.excerpt || 'No excerpt available.'}</p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Content</h3>
-                <div 
-                  className="prose dark:prose-invert max-w-none text-gray-700 dark:text-white bg-gray-50 dark:bg-gray-700 px-4 py-4 rounded-lg"
-                  dangerouslySetInnerHTML={{ __html: selectedAnnouncement.content }}
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Priority</h3>
-                  <div>{getPriorityBadge(selectedAnnouncement.priority)}</div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Status</h3>
-                  <div>{getStatusBadge(selectedAnnouncement.status)}</div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Published Date</h3>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {selectedAnnouncement.published_at 
-                      ? DateFormatter.formatDate(selectedAnnouncement.published_at)
-                      : 'Not published'
-                    }
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Created</h3>
-                  <p className="text-gray-700 dark:text-gray-300">
-                    {DateFormatter.formatDate(selectedAnnouncement.created_at)}
-                  </p>
-                </div>
-              </div>
-
-              {selectedAnnouncement.featured_image && (
-                <div>
-                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Featured Image</h3>
-                  <img 
-                    src={selectedAnnouncement.featured_image} 
-                    alt={selectedAnnouncement.title}
-                    className="max-w-full h-auto rounded-lg border border-gray-200 dark:border-gray-600"
-                  />
-                </div>
-              )}
-            </div>
-          )}
-          <DialogFooter>
-            <Button 
-              variant="outline" 
-              onClick={() => setViewModalOpen(false)}
-              className="admin-panel"
-            >
-              Close
-            </Button>
-            {selectedAnnouncement && (
-              <Button 
-                onClick={() => {
-                  setViewModalOpen(false)
-                  handleEdit(selectedAnnouncement)
-                }}
-                className="bg-blue-600 hover:bg-blue-700 text-white admin-panel"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Announcement
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {selectedAnnouncement && (
+        <ViewPage
+          title="View Announcement"
+          description="Full details of the selected announcement."
+          isOpen={viewModalOpen}
+          onClose={() => setViewModalOpen(false)}
+          data={{
+            title: selectedAnnouncement.title,
+            excerpt: selectedAnnouncement.excerpt,
+            content: selectedAnnouncement.content,
+            status: selectedAnnouncement.status,
+            published_at: selectedAnnouncement.published_at || selectedAnnouncement.created_at,
+            updated_at: selectedAnnouncement.updated_at,
+            priority: selectedAnnouncement.priority
+          }}
+          onEdit={() => handleEdit(selectedAnnouncement)}
+          getStatusBadge={getStatusBadge}
+          formatDate={(date: string) => DateFormatter.formatDate(date)}
+        />
+      )}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
