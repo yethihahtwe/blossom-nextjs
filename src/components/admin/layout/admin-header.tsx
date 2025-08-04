@@ -73,15 +73,15 @@ export function AdminHeader() {
     
     // Poll for new notifications every 30 seconds
     const interval = setInterval(() => {
-      loadUnreadCount()
-      // Only reload notifications if dropdown is not open to avoid disrupting user
-      if (!notificationsOpen) {
+      // Only poll if no modal is open and dropdown is closed to avoid disrupting user interactions
+      if (!notificationsOpen && !showNotificationDetail) {
+        loadUnreadCount()
         loadNotifications()
       }
     }, 30000)
     
     return () => clearInterval(interval)
-  }, [notificationsOpen])
+  }, [notificationsOpen, showNotificationDetail])
 
   const loadNotifications = async () => {
     try {
@@ -163,6 +163,42 @@ export function AdminHeader() {
     if (diffInDays < 7) return `${diffInDays}d ago`
     
     return date.toLocaleDateString()
+  }
+
+  const deleteNotification = async (notificationId: string) => {
+    try {
+      const response = await fetch(`/api/notifications/${notificationId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        // Update local state
+        setNotifications(prev => prev.filter(n => n.id !== notificationId))
+        // Update unread count if the deleted notification was unread
+        const deletedNotification = notifications.find(n => n.id === notificationId)
+        if (deletedNotification && !deletedNotification.is_read) {
+          setUnreadCount(prev => Math.max(0, prev - 1))
+        }
+        // Close detail modal if this notification was being viewed
+        if (selectedNotification?.id === notificationId) {
+          setShowNotificationDetail(false)
+          setSelectedNotification(null)
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete notification:', error)
+    }
+  }
+
+  const openNotificationDetail = async (notification: Notification) => {
+    setSelectedNotification(notification)
+    setShowNotificationDetail(true)
+    setNotificationsOpen(false)
+    
+    // Mark as read when opening detail view
+    if (!notification.is_read) {
+      await markAsRead(notification.id)
+    }
   }
 
   const handleLogout = async () => {
@@ -268,12 +304,15 @@ export function AdminHeader() {
                   {notifications.slice(0, 10).map((notification) => (
                     <DropdownMenuItem
                       key={notification.id}
-                      className={`p-3 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 ${
+                      className={`p-0 cursor-pointer border-b border-gray-200 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700 ${
                         !notification.is_read ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-white dark:bg-gray-800'
                       }`}
-                      onClick={() => !notification.is_read && markAsRead(notification.id)}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        openNotificationDetail(notification)
+                      }}
                     >
-                      <div className="flex items-start space-x-3 w-full">
+                      <div className="flex items-start space-x-3 w-full p-3 relative">
                         <div className="flex-shrink-0 mt-1">
                           {!notification.is_read && (
                             <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
@@ -290,20 +329,29 @@ export function AdminHeader() {
                             {formatRelativeTime(notification.created_at)}
                           </p>
                         </div>
-                        {notification.priority === 'urgent' && (
-                          <div className="flex-shrink-0">
+                        <div className="flex items-start space-x-2">
+                          {notification.priority === 'urgent' && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
                               Urgent
                             </span>
-                          </div>
-                        )}
-                        {notification.priority === 'important' && (
-                          <div className="flex-shrink-0">
+                          )}
+                          {notification.priority === 'important' && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
                               Important
                             </span>
-                          </div>
-                        )}
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="p-1 h-6 w-6 text-gray-400 hover:text-red-600 dark:hover:text-red-400"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              deleteNotification(notification.id)
+                            }}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
                     </DropdownMenuItem>
                   ))}
@@ -379,6 +427,120 @@ export function AdminHeader() {
           </div>
         </div>
       </div>
+
+      {/* Notification Detail Modal */}
+      <Dialog open={showNotificationDetail} onOpenChange={setShowNotificationDetail}>
+        <DialogContent className={`sm:max-w-[600px] ${montserrat.className}`}>
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+              {selectedNotification?.title}
+            </DialogTitle>
+            <div className="flex items-center space-x-2 mt-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {selectedNotification && formatRelativeTime(selectedNotification.created_at)}
+              </span>
+              {selectedNotification?.priority === 'urgent' && (
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400">
+                  Urgent
+                </span>
+              )}
+              {selectedNotification?.priority === 'important' && (
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
+                  Important
+                </span>
+              )}
+              {selectedNotification?.priority === 'high' && (
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
+                  High
+                </span>
+              )}
+            </div>
+          </DialogHeader>
+          
+          <DialogDescription asChild>
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Message</h4>
+                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                  {selectedNotification?.message}
+                </p>
+              </div>
+              
+              {selectedNotification?.metadata && Object.keys(selectedNotification.metadata).length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Details</h4>
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
+                    {selectedNotification.type === 'contact_form' && selectedNotification.metadata && (
+                      <>
+                        {selectedNotification.metadata.contact_name && (
+                          <div className="flex justify-between">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Name:</span>
+                            <span className="text-xs text-gray-900 dark:text-white">{selectedNotification.metadata.contact_name}</span>
+                          </div>
+                        )}
+                        {selectedNotification.metadata.contact_email && (
+                          <div className="flex justify-between">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Email:</span>
+                            <span className="text-xs text-gray-900 dark:text-white">{selectedNotification.metadata.contact_email}</span>
+                          </div>
+                        )}
+                        {selectedNotification.metadata.contact_phone && (
+                          <div className="flex justify-between">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Phone:</span>
+                            <span className="text-xs text-gray-900 dark:text-white">{selectedNotification.metadata.contact_phone}</span>
+                          </div>
+                        )}
+                        {selectedNotification.metadata.grade_level && (
+                          <div className="flex justify-between">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Grade Level:</span>
+                            <span className="text-xs text-gray-900 dark:text-white">{selectedNotification.metadata.grade_level}</span>
+                          </div>
+                        )}
+                        {selectedNotification.metadata.message && (
+                          <div>
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Additional Message:</span>
+                            <p className="text-xs text-gray-900 dark:text-white mt-1">{selectedNotification.metadata.message}</p>
+                          </div>
+                        )}
+                        {selectedNotification.metadata.submitted_at && (
+                          <div className="flex justify-between">
+                            <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Submitted:</span>
+                            <span className="text-xs text-gray-900 dark:text-white">
+                              {new Date(selectedNotification.metadata.submitted_at).toLocaleString()}
+                            </span>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogDescription>
+
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowNotificationDetail(false)}
+              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              Close
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (selectedNotification) {
+                  deleteNotification(selectedNotification.id)
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </header>
   )
 }

@@ -3,7 +3,6 @@ import type { Notification, CreateNotificationData, UpdateNotificationData } fro
 
 export class NotificationsService {
   static async getAll(): Promise<Notification[]> {
-    console.log('NotificationsService.getAll() called')
     const { data, error } = await supabase
       .from('notifications')
       .select('*')
@@ -14,7 +13,6 @@ export class NotificationsService {
       throw error
     }
 
-    console.log('getAll returned:', data?.length || 0, 'notifications')
     return data || []
   }
 
@@ -34,7 +32,6 @@ export class NotificationsService {
   }
 
   static async getUnreadCount(): Promise<number> {
-    console.log('NotificationsService.getUnreadCount() called')
     const { count, error } = await supabase
       .from('notifications')
       .select('*', { count: 'exact', head: true })
@@ -45,7 +42,6 @@ export class NotificationsService {
       throw error
     }
 
-    console.log('getUnreadCount returned:', count || 0)
     return count || 0
   }
 
@@ -106,7 +102,6 @@ export class NotificationsService {
 
   // Server-side method for getting all notifications (bypasses RLS)
   static async getAllServerSide(): Promise<Notification[]> {
-    console.log('NotificationsService.getAllServerSide() called')
     const { createClient } = await import('@supabase/supabase-js')
     
     const supabaseAdmin = createClient(
@@ -130,13 +125,11 @@ export class NotificationsService {
       throw error
     }
 
-    console.log('getAllServerSide returned:', data?.length || 0, 'notifications')
     return data || []
   }
 
   // Server-side method for getting unread count (bypasses RLS)
   static async getUnreadCountServerSide(): Promise<number> {
-    console.log('NotificationsService.getUnreadCountServerSide() called')
     const { createClient } = await import('@supabase/supabase-js')
     
     const supabaseAdmin = createClient(
@@ -160,12 +153,39 @@ export class NotificationsService {
       throw error
     }
 
-    console.log('getUnreadCountServerSide returned:', count || 0)
     return count || 0
   }
 
   static async markAsRead(id: string): Promise<boolean> {
     const { error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error marking notification as read:', error)
+      throw error
+    }
+
+    return true
+  }
+
+  // Server-side method for marking notifications as read (bypasses RLS)
+  static async markAsReadServerSide(id: string): Promise<boolean> {
+    const { createClient } = await import('@supabase/supabase-js')
+    
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+
+    const { error } = await supabaseAdmin
       .from('notifications')
       .update({ is_read: true })
       .eq('id', id)
@@ -194,6 +214,34 @@ export class NotificationsService {
 
   static async delete(id: string): Promise<boolean> {
     const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error deleting notification:', error)
+      throw error
+    }
+
+    return true
+  }
+
+  // Server-side method for deleting notifications (bypasses RLS)
+  static async deleteServerSide(id: string): Promise<boolean> {
+    const { createClient } = await import('@supabase/supabase-js')
+    
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      }
+    )
+
+    const { error } = await supabaseAdmin
       .from('notifications')
       .delete()
       .eq('id', id)

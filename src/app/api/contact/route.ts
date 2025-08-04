@@ -5,7 +5,7 @@ import { notificationsService } from '@/lib/services/notifications.service'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { first_name, last_name, email, phone, grade_level, message } = body
+    const { first_name, last_name, email, phone, grade_level, message, recaptchaToken } = body
 
     // Validate required fields
     if (!first_name || !last_name || !email || !phone || !grade_level) {
@@ -13,6 +13,31 @@ export async function POST(request: NextRequest) {
         { error: 'All fields are required' },
         { status: 400 }
       )
+    }
+
+    // Verify reCAPTCHA if token is provided
+    if (recaptchaToken && process.env.RECAPTCHA_SECRET_KEY) {
+      try {
+        const recaptchaResponse = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`,
+        })
+
+        const recaptchaResult = await recaptchaResponse.json()
+
+        if (!recaptchaResult.success || recaptchaResult.score < 0.5) {
+          return NextResponse.json(
+            { error: 'Security verification failed. Please try again.' },
+            { status: 400 }
+          )
+        }
+      } catch (recaptchaError) {
+        console.error('reCAPTCHA verification error:', recaptchaError)
+        // Continue without reCAPTCHA verification if there's an error
+      }
     }
 
     // Email validation
@@ -101,8 +126,7 @@ export async function POST(request: NextRequest) {
 
     // Create notification for admin panel
     try {
-      console.log('Attempting to create notification...')
-      const notification = await notificationsService.createServerSide({
+      await notificationsService.createServerSide({
         title: `New Contact Form Submission from ${first_name} ${last_name}`,
         message: `Contact request from ${first_name} ${last_name} (${email}) for ${grade_level} program. Phone: ${phone}`,
         type: 'contact_form',
@@ -116,7 +140,6 @@ export async function POST(request: NextRequest) {
           submitted_at: new Date().toISOString()
         }
       })
-      console.log('Notification created successfully:', notification)
     } catch (notificationError) {
       console.error('Failed to create notification:', notificationError)
       // Don't fail the entire request if notification creation fails

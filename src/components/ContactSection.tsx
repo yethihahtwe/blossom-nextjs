@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3'
 
 const ContactSection = () => {
+  const { executeRecaptcha } = useGoogleReCaptcha()
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -28,12 +30,21 @@ const ContactSection = () => {
     setMessage({ text: '', type: '' })
 
     try {
+      // Execute reCAPTCHA if available
+      let recaptchaToken = null
+      if (executeRecaptcha) {
+        recaptchaToken = await executeRecaptcha('contact_form')
+      }
+
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          recaptchaToken
+        }),
       })
 
       const result = await response.json()
@@ -246,6 +257,36 @@ const ContactSection = () => {
                 )}
                 {isLoading ? 'Sending...' : 'Send Information Request'}
               </button>
+
+              <p 
+                style={{
+                  fontSize: '12px',
+                  color: '#666',
+                  textAlign: 'center',
+                  marginTop: '12px',
+                  lineHeight: '1.4'
+                }}
+              >
+                This site is protected by reCAPTCHA and the Google{' '}
+                <a 
+                  href="https://policies.google.com/privacy" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: '#791218', textDecoration: 'underline' }}
+                >
+                  Privacy Policy
+                </a>
+                {' '}and{' '}
+                <a 
+                  href="https://policies.google.com/terms" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{ color: '#791218', textDecoration: 'underline' }}
+                >
+                  Terms of Service
+                </a>
+                {' '}apply.
+              </p>
               
               <style jsx>{`
                 @keyframes spin {

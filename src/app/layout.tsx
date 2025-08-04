@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "../styles/admin-theme.css";
+import ReCaptchaProvider from "@/components/ReCaptchaProvider";
 
 export const metadata: Metadata = {
   title: "Blossom Private School",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {children}
+        <ReCaptchaProvider>
+          {children}
+        </ReCaptchaProvider>
       </body>
     </html>
   );
