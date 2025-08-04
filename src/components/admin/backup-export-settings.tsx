@@ -217,8 +217,7 @@ export function BackupExportSettings() {
             <Button
               onClick={() => exportData('news')}
               disabled={isExporting}
-              variant="outline"
-              className="w-full justify-start"
+              className="w-full justify-start bg-blue-600 hover:bg-blue-700 text-white border-blue-600 hover:border-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm admin-panel"
             >
               <FileText className="h-4 w-4 mr-2" />
               Export News Articles ({stats.news})
@@ -227,8 +226,7 @@ export function BackupExportSettings() {
             <Button
               onClick={() => exportData('announcements')}
               disabled={isExporting}
-              variant="outline"
-              className="w-full justify-start"
+              className="w-full justify-start bg-orange-600 hover:bg-orange-700 text-white border-orange-600 hover:border-orange-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm admin-panel"
             >
               <AlertCircle className="h-4 w-4 mr-2" />
               Export Announcements ({stats.announcements})
