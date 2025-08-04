@@ -239,5 +239,36 @@ ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access to categories" ON categories
   FOR SELECT USING (true);
 
+-- Notifications Table
+CREATE TABLE IF NOT EXISTS notifications (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  message TEXT NOT NULL,
+  type VARCHAR(50) DEFAULT 'info' CHECK (type IN ('info', 'success', 'warning', 'error', 'contact_form')),
+  priority VARCHAR(20) DEFAULT 'normal' CHECK (priority IN ('low', 'normal', 'high', 'urgent')),
+  is_read BOOLEAN DEFAULT FALSE,
+  metadata JSONB DEFAULT '{}',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes for notifications
+CREATE INDEX IF NOT EXISTS idx_notifications_type ON notifications(type);
+CREATE INDEX IF NOT EXISTS idx_notifications_is_read ON notifications(is_read);
+CREATE INDEX IF NOT EXISTS idx_notifications_created_at ON notifications(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_notifications_priority ON notifications(priority);
+
+-- Create trigger to automatically update updated_at for notifications
+CREATE TRIGGER update_notifications_updated_at 
+  BEFORE UPDATE ON notifications 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Set up Row Level Security for notifications
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+-- Allow authenticated users to manage all notifications (admin operations)
+CREATE POLICY "Authenticated users can manage notifications" ON notifications
+  FOR ALL USING (auth.uid() IS NOT NULL);
+
 -- Note: For admin operations (create, update, delete), you'll need to set up authentication
 -- and create appropriate policies for authenticated users with admin roles

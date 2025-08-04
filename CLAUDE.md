@@ -2,6 +2,7 @@
 - Always read TODO.md and check when a task is done
 - Add every new task under TODO first then implement and check when done
 - Use serena mcp always
+- Use serena mcp every time you want to write a new file or make updates to existing files
 
 ## Project Overview
 - Creating a public-facing website for a private school
