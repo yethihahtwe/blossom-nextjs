@@ -9,13 +9,14 @@ interface NewsCardProps {
 }
 
 export default function NewsCard({ news, showExcerpt = true, showCategory = true }: NewsCardProps) {
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'Date not available';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
-  };
+  };;
 
   return (
     <article className="news-card">

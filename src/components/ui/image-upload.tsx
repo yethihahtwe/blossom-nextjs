@@ -2,10 +2,9 @@
 
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Upload, X, Image, Loader2 } from 'lucide-react'
-import { uploadImage, deleteImage } from '@/lib/storage'
+import { X, Loader2, Image } from 'lucide-react'
+import { uploadImage } from '@/lib/storage'
 
 interface ImageUploadProps {
   value?: string

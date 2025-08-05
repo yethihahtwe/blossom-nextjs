@@ -5,7 +5,7 @@ export interface Notification {
   type: 'info' | 'success' | 'warning' | 'error' | 'contact_form'
   priority: 'low' | 'normal' | 'high' | 'urgent'
   is_read: boolean
-  metadata: Record<string, any>
+  metadata: Record<string, unknown>
   created_at: string
   updated_at: string
 }
@@ -15,7 +15,7 @@ export interface CreateNotificationData {
   message: string
   type?: 'info' | 'success' | 'warning' | 'error' | 'contact_form'
   priority?: 'low' | 'normal' | 'high' | 'urgent'
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface UpdateNotificationData {
@@ -24,5 +24,5 @@ export interface UpdateNotificationData {
   type?: 'info' | 'success' | 'warning' | 'error' | 'contact_form'
   priority?: 'low' | 'normal' | 'high' | 'urgent'
   is_read?: boolean
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }

@@ -25,13 +25,14 @@ const NewsSection = () => {
     loadNews();
   }, []);
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'Date not available';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
-  };
+  };;
 
   return (
     <section className="news-section">

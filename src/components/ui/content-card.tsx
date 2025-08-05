@@ -103,11 +103,11 @@ export function ContentCard<T extends BaseContent>({
           {(hasAuthor || hasReadingTime) && (
             <div className="text-sm text-gray-500 flex items-center gap-2">
               {hasAuthor && (
-                <span>By {(content as any).author}</span>
+                <span>By {(content as Record<string, unknown>).author as string}</span>
               )}
               {hasAuthor && hasReadingTime && <span>•</span>}
               {hasReadingTime && (
-                <span>{(content as any).reading_time} min read</span>
+                <span>{(content as Record<string, unknown>).reading_time as number} min read</span>
               )}
             </div>
           )}
@@ -120,7 +120,7 @@ export function ContentCard<T extends BaseContent>({
 /**
  * News-specific formatters
  */
-export const newsFormatters: ContentFormatters<any> = {
+export const newsFormatters: ContentFormatters<BaseContent & { author?: string; reading_time?: number; category?: string }> = {
   getUrl: (news) => `/news/${news.slug}`,
   getCategoryBadge: (news) => (
     <span className="news-category">
@@ -144,7 +144,7 @@ export const newsFormatters: ContentFormatters<any> = {
 /**
  * Announcement-specific formatters
  */
-export const announcementFormatters: ContentFormatters<any> = {
+export const announcementFormatters: ContentFormatters<BaseContent & { priority: 'urgent' | 'important' | 'normal' }> = {
   getUrl: (announcement) => `/announcements/${announcement.slug}`,
   getPriorityBadge: (announcement) => {
     const priorityStyles = {

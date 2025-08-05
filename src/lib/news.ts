@@ -141,7 +141,7 @@ export async function getRecentNews(limit: number = 3): Promise<News[]> {
  */
 export async function updateNews(id: string, updates: Partial<News>): Promise<News | null> {
   // Clean the updates object and handle published_at properly
-  const cleanUpdates: any = {}
+  const cleanUpdates: Record<string, unknown> = {}
   
   // Copy valid fields, excluding auto-generated ones
   const allowedFields = ['title', 'content', 'excerpt', 'featured_image', 'category', 'status', 'author', 'reading_time', 'published_at']

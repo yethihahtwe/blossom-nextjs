@@ -334,9 +334,9 @@ export function AdminHeader() {
                               Urgent
                             </span>
                           )}
-                          {notification.priority === 'important' && (
+                          {notification.priority === 'high' && (
                             <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
-                              Important
+                              High
                             </span>
                           )}
                           <Button

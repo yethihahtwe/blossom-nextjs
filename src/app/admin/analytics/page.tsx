@@ -5,16 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { RefreshCw } from 'lucide-react'
-import { getViewStats, getTopContent } from '@/lib/analytics'
+import { getViewStats, getTopContent, ViewStats, TopContent } from '@/lib/analytics'
 
 export default function AnalyticsPage() {
-  const [viewStats, setViewStats] = useState<unknown>(null)
-  const [topContent, setTopContent] = useState<unknown[]>([])
-  // const [recentTrends, setRecentTrends] = useState<any[]>([])
-  // const [testResults, setTestResults] = useState<any[]>([])
+  const [viewStats, setViewStats] = useState<ViewStats | null>(null)
+  const [topContent, setTopContent] = useState<TopContent[]>([])
   const [loading, setLoading] = useState(false)
-  // const [news, setNews] = useState<any[]>([])
-  // const [announcements, setAnnouncements] = useState<any[]>([])
 
   const loadData = async () => {
     setLoading(true)
@@ -32,24 +28,6 @@ export default function AnalyticsPage() {
       setLoading(false)
     }
   }
-
-  // const testViewTracking = async () => {
-  //   if (news.length === 0 && announcements.length === 0) {
-  //     alert('No content available to test with!')
-  //     return
-  //   }
-  //   // ... implementation
-  // }
-
-  // const testHealthCheck = async () => {
-  //   try {
-  //     const response = await fetch('/api/track-view')
-  //     const result = await response.json()
-  //     alert(`Health Check: ${result.status} - ${result.message || 'Success'}`)
-  //   } catch (error) {
-  //     alert(`Health Check Failed: ${error.message}`)
-  //   }
-  // }
 
   useEffect(() => {
     loadData()
@@ -104,39 +82,6 @@ export default function AnalyticsPage() {
         </CardContent>
       </Card>
 
-      {/* Test Results */}
-      {testResults.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-gray-900 dark:text-white">Test Results</CardTitle>
-            <CardDescription className="text-gray-600 dark:text-gray-300">View tracking test outcomes</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {testResults.map((result, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
-                  <div>
-                    <p className="font-medium text-gray-900 dark:text-white">{result.type}: {result.title}</p>
-                    {result.success ? (
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        New view count: {result.result?.newViewCount || 'Unknown'}
-                      </p>
-                    ) : (
-                      <p className="text-sm text-red-600 dark:text-red-400">
-                        Error: {result.error || 'Failed to track view'}
-                      </p>
-                    )}
-                  </div>
-                  <Badge variant={result.success ? 'default' : 'destructive'}>
-                    {result.success ? 'Success' : 'Failed'}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Top Content */}
       <Card>
         <CardHeader>
@@ -146,7 +91,7 @@ export default function AnalyticsPage() {
         <CardContent>
           {topContent.length > 0 ? (
             <div className="space-y-3">
-              {topContent.map((item) => (
+              {topContent.map((item: TopContent) => (
                 <div key={`${item.type}-${item.id}`} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded">
                   <div>
                     <p className="font-medium text-gray-900 dark:text-white">{item.title}</p>
@@ -170,8 +115,6 @@ export default function AnalyticsPage() {
           )}
         </CardContent>
       </Card>
-
-
     </div>
   )
 }

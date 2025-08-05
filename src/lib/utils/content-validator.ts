@@ -57,7 +57,7 @@ export class ContentValidator {
     
     for (const [key, value] of Object.entries(updates)) {
       if (allowedFields.includes(key as keyof T) && value !== undefined) {
-        (cleanUpdates as any)[key] = value
+        (cleanUpdates as Record<string, unknown>)[key] = value
       }
     }
     
@@ -71,9 +71,9 @@ export class ContentValidator {
     const result = { ...updates }
     
     if (updates.status === 'published' && !updates.published_at) {
-      (result as any).published_at = new Date().toISOString()
+      (result as Record<string, unknown>).published_at = new Date().toISOString()
     } else if (updates.status === 'draft') {
-      (result as any).published_at = null
+      (result as Record<string, unknown>).published_at = null
     }
     
     return result

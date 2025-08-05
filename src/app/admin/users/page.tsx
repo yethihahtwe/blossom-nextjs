@@ -31,7 +31,6 @@ import toast from 'react-hot-toast'
 interface AdminUser extends User {
   role?: 'admin' | 'editor' | 'viewer'
   last_sign_in?: string
-  created_at?: string
 }
 
 export default function UsersPage() {

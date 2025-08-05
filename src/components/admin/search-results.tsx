@@ -51,7 +51,7 @@ export function SearchResults({ results, isOpen, onClose, query }: SearchResults
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-sm font-medium text-gray-900 dark:text-white">
-              Search Results for "{query}"
+              Search Results for &quot;{query}&quot;
             </h3>
             <Button
               variant="ghost"
@@ -71,7 +71,7 @@ export function SearchResults({ results, isOpen, onClose, query }: SearchResults
                   <FileText className="h-8 w-8 mx-auto" />
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  No results found for "{query}"
+                  No results found for &quot;{query}&quot;
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   Try searching for news articles or announcements

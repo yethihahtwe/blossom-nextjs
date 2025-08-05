@@ -3,8 +3,10 @@
 import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, Megaphone, Users, Eye } from 'lucide-react'
-import { getPublishedNews, type News } from '@/lib/news'
-import { getPublishedAnnouncements, type Announcement } from '@/lib/announcements'
+import { getPublishedNews } from '@/lib/news'
+import { type News } from '@/lib/supabase'
+import { getPublishedAnnouncements } from '@/lib/announcements'
+import { type Announcement } from '@/lib/supabase'
 import { getViewStats } from '@/lib/analytics'
 
 interface DashboardStats {
@@ -172,7 +174,7 @@ export function AdminDashboard() {
                     <div>
                       <p className="font-medium text-sm text-gray-900 dark:text-white">{article.title}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Published {new Date(article.published_at).toLocaleDateString()}
+                        Published {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Not published'}
                       </p>
                     </div>
                     <span className="text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded">
@@ -202,7 +204,7 @@ export function AdminDashboard() {
                     <div>
                       <p className="font-medium text-sm text-gray-900 dark:text-white">{announcement.title}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Published {new Date(announcement.published_at).toLocaleDateString()}
+                        Published {announcement.published_at ? new Date(announcement.published_at).toLocaleDateString() : 'Not published'}
                       </p>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded ${getPriorityColors(announcement.priority)}`}>

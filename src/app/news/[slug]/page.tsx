@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: news.title,
       description: news.excerpt,
-      images: [news.featured_image],
+      images: news.featured_image ? [news.featured_image] : undefined,
       type: 'article',
       publishedTime: news.published_at,
       authors: news.author ? [news.author] : undefined,
@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: news.title,
       description: news.excerpt,
-      images: [news.featured_image],
+      images: news.featured_image ? [news.featured_image] : undefined,
     },
   };
 }
@@ -57,7 +57,8 @@ export default async function NewsArticlePage({ params }: PageProps) {
     notFound();
   }
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return 'Date not available';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -146,15 +147,17 @@ export default async function NewsArticlePage({ params }: PageProps) {
           </div>
 
           {/* Featured Image */}
-          <div className="relative h-96 w-full">
-            <Image
-              src={news.featured_image}
-              alt={news.title}
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+          {news.featured_image && (
+            <div className="relative h-96 w-full">
+              <Image
+                src={news.featured_image}
+                alt={news.title}
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+          )}
 
           {/* Content */}
           <div className="p-8">
@@ -162,23 +165,6 @@ export default async function NewsArticlePage({ params }: PageProps) {
               className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-red-600 prose-strong:text-gray-900"
               dangerouslySetInnerHTML={{ __html: news.content }}
             />
-            
-            {/* Tags */}
-            {news.tags && news.tags.length > 0 && (
-              <div className="mt-8 pt-8 border-t border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Tags:</h3>
-                <div className="flex flex-wrap gap-2">
-                  {news.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -193,15 +179,17 @@ export default async function NewsArticlePage({ params }: PageProps) {
                   href={`/news/${article.slug}`}
                   className="block bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
                 >
-                  <div className="relative h-32 w-full">
-                    <Image
-                      src={article.featured_image}
-                      alt={article.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
+                  {article.featured_image && (
+                    <div className="relative h-32 w-full">
+                      <Image
+                        src={article.featured_image}
+                        alt={article.title}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                    </div>
+                  )}
                   <div className="p-4">
                     <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 mb-2">
                       {article.title}

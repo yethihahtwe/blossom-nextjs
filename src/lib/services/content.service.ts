@@ -39,7 +39,7 @@ export class BaseContentService<T extends BaseContent> implements ContentService
    */
   async getRecent(limit: number = 3): Promise<T[]> {
     if ('getRecent' in this.repository) {
-      return (this.repository as any).getRecent(limit)
+      return (this.repository as ContentRepository<T> & { getRecent: (limit: number) => Promise<T[]> }).getRecent(limit)
     }
     // Fallback to getting all published and limiting
     const published = await this.getPublished()

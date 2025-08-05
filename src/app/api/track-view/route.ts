@@ -22,8 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get client information
-    const ip = request.ip || 
-               request.headers.get('x-forwarded-for') || 
+    const ip = request.headers.get('x-forwarded-for') || 
                request.headers.get('x-real-ip') || 
                'unknown'
     const userAgent = request.headers.get('user-agent') || 'unknown'

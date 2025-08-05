@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { announcementsService } from '@/lib/services/announcements.service'
 import { type Announcement } from '@/lib/supabase'
 import { Priority } from '@/lib/types/content'
-import { StorageService } from '@/lib/storage'
+
 import { DateFormatter } from '@/lib/utils/date-formatter'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -176,7 +176,7 @@ export function AnnouncementsTable() {
         published_at: createForm.published_at ? DateFormatter.toISOString(createForm.published_at) : undefined
       }
 
-      const newAnnouncement = await announcementsService.create(announcementData)
+      const newAnnouncement = await announcementsService.create(announcementData as Omit<Announcement, 'id' | 'created_at' | 'updated_at' | 'slug'>)
       
       if (newAnnouncement) {
         setAnnouncements(prev => [newAnnouncement, ...prev])
@@ -207,7 +207,7 @@ export function AnnouncementsTable() {
         published_at: editForm.published_at ? DateFormatter.toISOString(editForm.published_at) : undefined
       }
 
-      const updatedAnnouncement = await announcementsService.update(selectedAnnouncement.id, updateData)
+      const updatedAnnouncement = await announcementsService.update(selectedAnnouncement.id, updateData as Partial<Announcement>)
       
       if (updatedAnnouncement) {
         setAnnouncements(prev => 
@@ -273,27 +273,7 @@ export function AnnouncementsTable() {
     setEditModalOpen(true)
   }
 
-  const handleImageUpload = async (file: File, isEdit: boolean = false) => {
-    try {
-      const imageUrl = await StorageService.uploadImage(file, 'announcements')
-      if (imageUrl) {
-        if (isEdit) {
-          setEditForm(prev => ({ ...prev, featured_image: imageUrl }))
-        } else {
-          setCreateForm(prev => ({ ...prev, featured_image: imageUrl }))
-        }
-        toast.success('Image uploaded successfully!')
-        return imageUrl
-      } else {
-        toast.error('Failed to upload image')
-        return null
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error)
-      toast.error('Failed to upload image')
-      return null
-    }
-  }
+
 
   const getPriorityBadge = (priority: Priority) => {
     // const variants = {
@@ -779,7 +759,7 @@ export function AnnouncementsTable() {
               <ImageUpload
                 value={createForm.featured_image}
                 onChange={(url) => setCreateForm(prev => ({ ...prev, featured_image: url }))}
-                onUpload={(file) => handleImageUpload(file, false)}
+                
               />
             </div>
 
@@ -922,7 +902,7 @@ export function AnnouncementsTable() {
               <ImageUpload
                 value={editForm.featured_image}
                 onChange={(url) => setEditForm(prev => ({ ...prev, featured_image: url }))}
-                onUpload={(file) => handleImageUpload(file, true)}
+                
               />
             </div>
 
@@ -984,7 +964,7 @@ export function AnnouncementsTable() {
             priority: selectedAnnouncement.priority
           }}
           onEdit={() => handleEdit(selectedAnnouncement)}
-          getStatusBadge={getStatusBadge}
+          getStatusBadge={(status: string) => getStatusBadge(status as 'draft' | 'published')}
           formatDate={(date: string) => DateFormatter.formatDate(date)}
         />
       )}

@@ -2,7 +2,7 @@ import { supabase } from '../supabase'
 import { BaseContent, ContentRepository } from '../types/content'
 import { SlugGenerator } from '../utils/slug-generator'
 import { ContentValidator } from '../utils/content-validator'
-import { DateFormatter } from '../utils/date-formatter'
+// import { DateFormatter } from '../utils/date-formatter'
 
 /**
  * Base repository implementation for content entities
@@ -105,7 +105,7 @@ export abstract class BaseContentRepository<T extends BaseContent> implements Co
       const now = new Date().toISOString()
       let publishedAt = null
       if (item.status === 'published') {
-        publishedAt = (item as any).published_at || now
+        publishedAt = (item as Record<string, unknown>).published_at as string || now
       }
 
       const { data, error } = await supabase
@@ -148,7 +148,7 @@ export abstract class BaseContentRepository<T extends BaseContent> implements Co
       cleanUpdates = ContentValidator.handlePublishedAt(cleanUpdates)
       
       // Always update the updated_at timestamp
-      cleanUpdates.updated_at = new Date().toISOString() as any
+      (cleanUpdates as Record<string, unknown>).updated_at = new Date().toISOString()
 
       const { data, error } = await supabase
         .from(this.tableName)
