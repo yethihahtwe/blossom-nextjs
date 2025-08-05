@@ -8,10 +8,11 @@ export interface BaseContent {
   content: string
   excerpt?: string
   featured_image?: string
-  status: 'draft' | 'published'
+  status: 'draft' | 'published' | 'archived'
   published_at?: string
   created_at: string
   updated_at: string
+  view_count?: number
 }
 
 /**

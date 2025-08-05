@@ -11,6 +11,7 @@ export interface News {
   tags?: string[];
   author?: string;
   reading_time?: number;
+  view_count?: number;
 }
 
 export interface NewsCardProps {

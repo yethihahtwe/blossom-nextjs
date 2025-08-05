@@ -267,7 +267,7 @@ export function AnnouncementsTable() {
       excerpt: announcement.excerpt,
       featured_image: announcement.featured_image || '',
       priority: announcement.priority,
-      status: announcement.status,
+      status: announcement.status === 'archived' ? 'draft' : announcement.status as 'draft' | 'published',
       published_at: announcement.published_at ? new Date(announcement.published_at) : undefined
     })
     setEditModalOpen(true)
@@ -295,9 +295,15 @@ export function AnnouncementsTable() {
     )
   }
 
-  const getStatusBadge = (status: 'draft' | 'published') => {
+  const getStatusBadge = (status: 'draft' | 'published' | 'archived') => {
+    const variants = {
+      published: 'default',
+      draft: 'secondary', 
+      archived: 'outline'
+    } as const
+    
     return (
-      <Badge variant={status === 'published' ? 'default' : 'secondary'}>
+      <Badge variant={variants[status] || 'secondary'}>
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </Badge>
     )

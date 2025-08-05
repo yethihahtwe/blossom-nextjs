@@ -443,13 +443,8 @@ export function AdminHeader() {
                   Urgent
                 </span>
               )}
-              {selectedNotification?.priority === 'important' && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
-                  Important
-                </span>
-              )}
               {selectedNotification?.priority === 'high' && (
-                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400">
+                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400">
                   High
                 </span>
               )}
@@ -471,41 +466,41 @@ export function AdminHeader() {
                   <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 space-y-2">
                     {selectedNotification.type === 'contact_form' && selectedNotification.metadata && (
                       <>
-                        {selectedNotification.metadata.contact_name && (
+                        {String((selectedNotification.metadata as Record<string, unknown>).contact_name || '') && (
                           <div className="flex justify-between">
                             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Name:</span>
-                            <span className="text-xs text-gray-900 dark:text-white">{selectedNotification.metadata.contact_name}</span>
+                            <span className="text-xs text-gray-900 dark:text-white">{String((selectedNotification.metadata as Record<string, unknown>).contact_name || '')}</span>
                           </div>
                         )}
-                        {selectedNotification.metadata.contact_email && (
+                        {String((selectedNotification.metadata as Record<string, unknown>).contact_email || '') && (
                           <div className="flex justify-between">
                             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Email:</span>
-                            <span className="text-xs text-gray-900 dark:text-white">{selectedNotification.metadata.contact_email}</span>
+                            <span className="text-xs text-gray-900 dark:text-white">{String((selectedNotification.metadata as Record<string, unknown>).contact_email || '')}</span>
                           </div>
                         )}
-                        {selectedNotification.metadata.contact_phone && (
+                        {String((selectedNotification.metadata as Record<string, unknown>).contact_phone || '') && (
                           <div className="flex justify-between">
                             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Phone:</span>
-                            <span className="text-xs text-gray-900 dark:text-white">{selectedNotification.metadata.contact_phone}</span>
+                            <span className="text-xs text-gray-900 dark:text-white">{String((selectedNotification.metadata as Record<string, unknown>).contact_phone || '')}</span>
                           </div>
                         )}
-                        {selectedNotification.metadata.grade_level && (
+                        {String((selectedNotification.metadata as Record<string, unknown>).grade_level || '') && (
                           <div className="flex justify-between">
                             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Grade Level:</span>
-                            <span className="text-xs text-gray-900 dark:text-white">{selectedNotification.metadata.grade_level}</span>
+                            <span className="text-xs text-gray-900 dark:text-white">{String((selectedNotification.metadata as Record<string, unknown>).grade_level || '')}</span>
                           </div>
                         )}
-                        {selectedNotification.metadata.message && (
+                        {String((selectedNotification.metadata as Record<string, unknown>).message || '') && (
                           <div>
                             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Additional Message:</span>
-                            <p className="text-xs text-gray-900 dark:text-white mt-1">{selectedNotification.metadata.message}</p>
+                            <p className="text-xs text-gray-900 dark:text-white mt-1">{String((selectedNotification.metadata as Record<string, unknown>).message || '')}</p>
                           </div>
                         )}
-                        {selectedNotification.metadata.submitted_at && (
+                        {String((selectedNotification.metadata as Record<string, unknown>).submitted_at || '') && (
                           <div className="flex justify-between">
                             <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Submitted:</span>
                             <span className="text-xs text-gray-900 dark:text-white">
-                              {new Date(selectedNotification.metadata.submitted_at).toLocaleString()}
+                              {new Date(String((selectedNotification.metadata as Record<string, unknown>).submitted_at || '')).toLocaleString()}
                             </span>
                           </div>
                         )}

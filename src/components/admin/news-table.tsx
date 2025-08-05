@@ -167,7 +167,7 @@ export function NewsTable() {
     
     // Date range filter
     const matchesDateRange = (!dateRange.from && !dateRange.to) || (() => {
-      const articleDate = new Date(article.published_at)
+      const articleDate = new Date(article.published_at || '')
       const fromDate = dateRange.from
       const toDate = dateRange.to
       
@@ -221,7 +221,7 @@ export function NewsTable() {
       featured_image: article.featured_image || '',
       category: article.category,
       status: article.status as 'draft' | 'published' | 'archived',
-      published_at: article.published_at ? new Date(article.published_at) : undefined
+      published_at: article.published_at ? new Date(article.published_at || '') : undefined
     })
     setEditModalOpen(true)
   }
@@ -295,8 +295,10 @@ export function NewsTable() {
       title: '',
       content: '',
       excerpt: '',
+      featured_image: '',
       category: 'General',
-      status: 'draft'
+      status: 'draft',
+      published_at: undefined
     })
     setCreateModalOpen(true)
   }
@@ -350,27 +352,6 @@ export function NewsTable() {
       setIsSaving(false)
     }
   }
-
-  const handleImageUpload = async (file: File, isEdit: boolean = false) => {
-    try {
-      const imageUrl = await StorageService.uploadImage(file, 'news')
-      if (imageUrl) {
-        if (isEdit) {
-          setEditForm(prev => ({ ...prev, featured_image: imageUrl }))
-        } else {
-          setCreateForm(prev => ({ ...prev, featured_image: imageUrl }))
-        }
-        toast.success('Image uploaded successfully!')
-        return imageUrl
-      } else {
-        toast.error('Failed to upload image')
-        return null
-      }
-    } catch (error) {
-      console.error('Error uploading image:', error)
-      toast.error('Failed to upload image')
-      return null
-    }
   }
 
   const hasActiveFilters = selectedCategories.length > 0 || dateRange.from || dateRange.to || searchQuery
@@ -646,7 +627,7 @@ export function NewsTable() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-gray-600 dark:text-gray-300 py-4 px-4">
-                    {formatDate(article.published_at)}
+                    {formatDate(article.published_at || '')}
                   </TableCell>
                   <TableCell className="py-4 px-4">
                     {getStatusBadge(article.status)}
@@ -772,7 +753,7 @@ export function NewsTable() {
             excerpt: selectedArticle.excerpt,
             content: selectedArticle.content,
             status: selectedArticle.status,
-            published_at: selectedArticle.published_at,
+            published_at: selectedArticle.published_at || selectedArticle.created_at,
             updated_at: selectedArticle.updated_at,
             view_count: selectedArticle.view_count,
             category: selectedArticle.category
@@ -826,7 +807,6 @@ export function NewsTable() {
               label="Featured Image (Optional)"
               value={editForm.featured_image}
               onChange={(url) => setEditForm(prev => ({ ...prev, featured_image: url }))}
-              onUpload={(file) => handleImageUpload(file, true)}
               className="admin-panel"
             />
             
@@ -991,7 +971,6 @@ export function NewsTable() {
               label="Featured Image (Optional)"
               value={createForm.featured_image}
               onChange={(url) => setCreateForm(prev => ({ ...prev, featured_image: url }))}
-              onUpload={(file) => handleImageUpload(file, false)}
               className="admin-panel"
             />
             
