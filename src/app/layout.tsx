@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "../styles/style.css";
 import "../styles/admin-theme.css";
 import ReCaptchaProvider from "@/components/ReCaptchaProvider";
 

@@ -11,6 +11,7 @@ const Header = () => {
   const router = useRouter();
   const [loadingHref, setLoadingHref] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeHash, setActiveHash] = useState<string>('');
 
   // Clear loading state when pathname changes
   useEffect(() => {
@@ -22,9 +23,59 @@ const Header = () => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  // Track hash changes and scroll position for anchor links
+  useEffect(() => {
+    const handleHashChange = () => {
+      setActiveHash(window.location.hash);
+    };
+
+    const handleScroll = () => {
+      // Update active section based on scroll position
+      const sections = ['about', 'programs', 'contact'];
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveHash(`#${section}`);
+            return;
+          }
+        }
+      }
+
+      // If not in any section, clear hash (likely at top of page)
+      if (window.scrollY < 100) {
+        setActiveHash('');
+      }
+    };
+
+    // Set initial hash
+    handleHashChange();
+
+    // Add event listeners
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('scroll', handleScroll);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [pathname]);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
+
+  // Check if an anchor link should be active
+  const isAnchorActive = (hash: string) => {
+    // Only show active on home page
+    if (pathname !== '/') return false;
+    return activeHash === hash;
+  };
+
   return (
     <>
       {/* Urgent Announcement Banner */}
@@ -58,16 +109,34 @@ const Header = () => {
             </li>
             <li>
               <Link 
-                href="/#about" 
-                className={pathname === '/' ? 'active' : ''}
+                href="/#about"
+                className={isAnchorActive('#about') ? 'active' : ''}
+                onClick={(e) => {
+                  if (pathname !== '/') {
+                    e.preventDefault();
+                    router.push('/#about');
+                  }
+                }}
+                style={{
+                  color: isAnchorActive('#about') ? 'var(--primary-color)' : undefined
+                }}
               >
                 About Us
               </Link>
             </li>
             <li>
               <Link 
-                href="/#programs" 
-                className={pathname === '/' ? 'active' : ''}
+                href="/#programs"
+                className={isAnchorActive('#programs') ? 'active' : ''}
+                onClick={(e) => {
+                  if (pathname !== '/') {
+                    e.preventDefault();
+                    router.push('/#programs');
+                  }
+                }}
+                style={{
+                  color: isAnchorActive('#programs') ? 'var(--primary-color)' : undefined
+                }}
               >
                 Programs
               </Link>
@@ -84,8 +153,17 @@ const Header = () => {
             </li>
             <li>
               <Link 
-                href="/#contact" 
-                className={pathname === '/' ? 'active' : ''}
+                href="/#contact"
+                className={isAnchorActive('#contact') ? 'active' : ''}
+                onClick={(e) => {
+                  if (pathname !== '/') {
+                    e.preventDefault();
+                    router.push('/#contact');
+                  }
+                }}
+                style={{
+                  color: isAnchorActive('#contact') ? 'var(--primary-color)' : undefined
+                }}
               >
                 Contact
               </Link>
@@ -127,9 +205,15 @@ interface NavLinkProps {
 
 const NavLink = ({ href, currentPath, loadingHref, setLoadingHref, router, children }: NavLinkProps) => {
   // Improved active state detection
-  const isActive = href === '/' 
-    ? currentPath === '/' 
-    : currentPath === href || currentPath.startsWith(href + '/');
+  let isActive = false;
+  
+  if (href === '/') {
+    // For home page, only active when exactly on home page
+    isActive = currentPath === '/';
+  } else {
+    // For other pages, active when on exact page or subpages
+    isActive = currentPath === href || currentPath.startsWith(href + '/');
+  }
   
   const isLoading = loadingHref === href;
 
@@ -143,21 +227,15 @@ const NavLink = ({ href, currentPath, loadingHref, setLoadingHref, router, child
   };
 
   return (
-    <button
+    <Link
+      href={href}
       onClick={handleClick}
-      className={`nav-link-button ${isActive ? 'active' : ''}`}
+      className={isActive ? 'active' : ''}
       style={{
-        background: 'none',
-        border: 'none',
-        padding: 0,
-        font: 'inherit',
-        cursor: 'pointer',
-        outline: 'inherit',
-        textDecoration: 'inherit',
-        color: 'inherit',
         display: 'flex',
         alignItems: 'center',
-        gap: '8px'
+        gap: '8px',
+        color: isActive ? 'var(--primary-color)' : undefined
       }}
     >
       {children}
@@ -208,7 +286,7 @@ const NavLink = ({ href, currentPath, loadingHref, setLoadingHref, router, child
           }
         }
       `}</style>
-    </button>
+    </Link>
   );
 };
 

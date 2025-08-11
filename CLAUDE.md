@@ -4,7 +4,7 @@
 ## Project Overview
 - Creating a public-facing website for a private school
 - Platform: Next.js 15.3.5 with TypeScript
-- Development URL: localhost:3000
+- Development URL: localhost:3000 (or localhost:3001 if port 3000 is in use)
 
 ## Technical Details
 - Framework: Next.js 15.3.5 with TypeScript and React 19
@@ -66,6 +66,14 @@
   - src/app/news/[slug]/loading.tsx (individual article loading)
 - ✅ Skeleton components with proper structure matching actual content
 - ✅ Professional loading experience during page navigation
+
+## Navigation Menu Enhancements
+- ✅ Fixed navigation menu highlighting for visited pages
+- ✅ Active state detection for both page routes and anchor links
+- ✅ Scroll-based active section detection for anchor links (#about, #programs, #contact)
+- ✅ Proper active class styling for all navigation items
+- ✅ Loading spinner indicators for page transitions
+- ✅ Mobile menu auto-close on navigation
 
 ## Coding Guidelines
 - Do not explain what you have done in the chat response
