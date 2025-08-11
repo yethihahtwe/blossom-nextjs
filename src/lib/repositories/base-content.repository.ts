@@ -92,7 +92,7 @@ export abstract class BaseContentRepository<T extends BaseContent> implements Co
   async create(item: Omit<T, 'id' | 'created_at' | 'updated_at' | 'slug'>): Promise<T | null> {
     try {
       // Validate data
-      const errors = ContentValidator.validateCreateData(item)
+      const errors = ContentValidator.validateCreateData(item as Partial<T>)
       if (errors.length > 0) {
         console.error(`Validation errors for ${this.tableName}:`, errors)
         return null
@@ -145,7 +145,7 @@ export abstract class BaseContentRepository<T extends BaseContent> implements Co
       // Clean updates and handle published_at
       const allowedFields = this.getAllowedUpdateFields()
       let cleanUpdates = ContentValidator.cleanUpdateData(updates, allowedFields)
-      cleanUpdates = ContentValidator.handlePublishedAt(cleanUpdates)
+      cleanUpdates = ContentValidator.handlePublishedAt(cleanUpdates) as Partial<T>
       
       // Always update the updated_at timestamp
       (cleanUpdates as Record<string, unknown>).updated_at = new Date().toISOString()

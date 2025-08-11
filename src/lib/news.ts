@@ -1,5 +1,8 @@
 import { supabase, type News } from './supabase'
 
+// Re-export types
+export type { News }
+
 /**
  * Get all news articles for admin panel (including drafts)
  */

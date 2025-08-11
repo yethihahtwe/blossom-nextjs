@@ -1,5 +1,8 @@
 import { supabase, type Announcement } from './supabase'
 
+// Re-export types
+export type { Announcement }
+
 /**
  * Get all published announcements
  */

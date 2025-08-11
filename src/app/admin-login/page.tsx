@@ -8,13 +8,10 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { supabase } from '@/lib/supabase'
 import { Eye, EyeOff, LogIn } from 'lucide-react'
-import { Montserrat } from 'next/font/google'
-
-const montserrat = Montserrat({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  display: 'swap',
-})
+// Temporary fix for deployment - using system font instead of Google Fonts
+const montserrat = {
+  className: 'font-sans'
+}
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('')

@@ -60,7 +60,7 @@ export function useAdminSearch() {
           title: article.title,
           excerpt: article.excerpt || '',
           type: 'news',
-          published_at: article.published_at,
+          published_at: article.published_at || '',
           status: article.status,
           url: `/admin/news/${article.id}`
         })
@@ -78,7 +78,7 @@ export function useAdminSearch() {
           title: announcement.title,
           excerpt: announcement.excerpt || '',
           type: 'announcement',
-          published_at: announcement.published_at,
+          published_at: announcement.published_at || '',
           status: announcement.status,
           priority: announcement.priority,
           url: `/admin/announcements/${announcement.id}`

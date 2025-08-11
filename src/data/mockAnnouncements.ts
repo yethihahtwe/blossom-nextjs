@@ -285,7 +285,7 @@ export const getAnnouncementPriorities = (): string[] => {
   const priorities = mockAnnouncements
     .filter(announcement => announcement.status === 'published')
     .map(announcement => announcement.priority)
-    .filter((priority): priority is string => priority !== undefined);
+    .filter((priority): priority is 'normal' | 'important' | 'urgent' => priority !== undefined);
   
   return Array.from(new Set(priorities));
 };

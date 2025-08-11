@@ -66,6 +66,7 @@ export interface ContentService<T extends BaseContent> {
   create(data: Omit<T, 'id' | 'created_at' | 'updated_at' | 'slug'>): Promise<T | null>
   update(id: string, updates: Partial<T>): Promise<T | null>
   delete(id: string): Promise<boolean>
+  getRecent(limit?: number): Promise<T[]>
 }
 
 /**
