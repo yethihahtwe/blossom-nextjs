@@ -10,11 +10,21 @@ const Header = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [loadingHref, setLoadingHref] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Clear loading state when pathname changes
   useEffect(() => {
     setLoadingHref(null);
   }, [pathname]);
+
+  // Close mobile menu when pathname changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
   return (
     <>
       {/* Urgent Announcement Banner */}
@@ -39,15 +49,29 @@ const Header = () => {
         </div>
 
         {/* Main Navigation */}
-        <nav className="main-navigation" role="navigation">
+        <nav className={`main-navigation ${mobileMenuOpen ? 'mobile-open' : ''}`} role="navigation">
           <ul className="nav-menu">
             <li>
               <NavLink href="/" currentPath={pathname} loadingHref={loadingHref} setLoadingHref={setLoadingHref} router={router}>
                 Home
               </NavLink>
             </li>
-            <li><Link href="/#about">About Us</Link></li>
-            <li><Link href="/#programs">Programs</Link></li>
+            <li>
+              <Link 
+                href="/#about" 
+                className={pathname === '/' ? 'active' : ''}
+              >
+                About Us
+              </Link>
+            </li>
+            <li>
+              <Link 
+                href="/#programs" 
+                className={pathname === '/' ? 'active' : ''}
+              >
+                Programs
+              </Link>
+            </li>
             <li>
               <NavLink href="/news" currentPath={pathname} loadingHref={loadingHref} setLoadingHref={setLoadingHref} router={router}>
                 News
@@ -58,13 +82,29 @@ const Header = () => {
                 Announcements
               </NavLink>
             </li>
-            <li><Link href="/#contact">Contact</Link></li>
+            <li>
+              <Link 
+                href="/#contact" 
+                className={pathname === '/' ? 'active' : ''}
+              >
+                Contact
+              </Link>
+            </li>
           </ul>
-          <Link href="/admissions" className="apply-now-btn">Apply Now</Link>
+          <Link 
+            href="/admissions" 
+            className={`apply-now-btn ${pathname === '/admissions' ? 'active' : ''}`}
+          >
+            Apply Now
+          </Link>
         </nav>
 
         {/* Mobile menu toggle */}
-        <button className="mobile-menu-toggle">
+        <button 
+          className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`}
+          onClick={toggleMobileMenu}
+          aria-label="Toggle mobile menu"
+        >
           <span></span>
           <span></span>
           <span></span>
@@ -86,7 +126,11 @@ interface NavLinkProps {
 }
 
 const NavLink = ({ href, currentPath, loadingHref, setLoadingHref, router, children }: NavLinkProps) => {
-  const isActive = currentPath === href || (href !== '/' && currentPath.startsWith(href));
+  // Improved active state detection
+  const isActive = href === '/' 
+    ? currentPath === '/' 
+    : currentPath === href || currentPath.startsWith(href + '/');
+  
   const isLoading = loadingHref === href;
 
   const handleClick = (e: React.MouseEvent) => {

@@ -137,7 +137,8 @@ body {
   margin: 0 20px;
 }
 
-.nav-menu a {
+.nav-menu a,
+.nav-menu .nav-link-button {
   text-decoration: none;
   color: #666;
   font-weight: 500;
@@ -147,7 +148,9 @@ body {
 }
 
 .nav-menu a:hover,
-.nav-menu a.active {
+.nav-menu a.active,
+.nav-menu .nav-link-button:hover,
+.nav-menu .nav-link-button.active {
   color: var(--primary-color);
 }
 
@@ -164,7 +167,8 @@ body {
   flex-shrink: 0;
 }
 
-.apply-now-btn:hover {
+.apply-now-btn:hover,
+.apply-now-btn.active {
   background: #5d0e14;
 }
 
