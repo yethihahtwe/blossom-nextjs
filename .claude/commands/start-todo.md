@@ -1,0 +1,1 @@
+In CLAUDE.md, you will find the todo list with heading '# TODO'. Tasks completed are marked with '[*]' and those with '[ ]' still need to be implemented. Whenever this command is run, always implement the first uncompleted task in the list. Only one, no more. If you finish the task, mark it as '[*]'.

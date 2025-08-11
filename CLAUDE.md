@@ -1,30 +1,16 @@
-## Instruction
-- Always read TODO.md and check when a task is done
-- Add every new task under TODO first then implement and check when done
-- Use serena mcp always
-- Use serena mcp every time you want to write a new file or make updates to existing files
+# TODO
+[] 
 
 ## Project Overview
 - Creating a public-facing website for a private school
-- Initial requirements include posting regular news and announcements
 - Platform: Next.js 15.3.5 with TypeScript
-- Hosting: TBD (migrated from Namecheap Stellar Plus)
-- Database: TBD (considering modern alternatives to MySQL)
 - Development URL: localhost:3000
-
-## Project Status
-- ✅ Hero slider design and animations ready for Next.js integration
-- ✅ Content structure defined (News, Announcements)
-- ✅ Next.js project initialized with TypeScript and Tailwind CSS
-- ✅ Basic component structure created (Header, Hero, News, Programs, About, Contact, Footer)
-- 🔄 Next: Implement dynamic content management and integrate custom design
 
 ## Technical Details
 - Framework: Next.js 15.3.5 with TypeScript and React 19
 - Styling: Tailwind CSS 4.0 (early development version) with `@import "tailwindcss"` and `@theme` configuration
 - Database: Supabase (PostgreSQL) with Row Level Security
 - Frontend: React components with TypeScript
-- Admin panel: TBD (considering Sanity CMS or custom solution)
 - Development: Next.js with Turbopack for fast development
 
 ## Tailwind CSS v4 Configuration
@@ -46,14 +32,6 @@
 - Features: Row Level Security (RLS) enabled for public read access
 - Data access functions: src/lib/news.ts, src/lib/announcements.ts
 - Schema file: supabase-schema.sql (run in Supabase SQL Editor)
-
-## Design and Layout
-- Inside ./references directory, web designs and png files have been added for website reference
-- Hero section implemented as a slider with educational icons (Learn, Play, Skill, Award)
-- Layout referenced from https://blossom.edu.mm, to be used as a base layout
-- Specific design details follow web-design.jpg in the references directory
-- Cambridge English Qualifications branding integrated
-- TODO: Make logo_dark_mode and cambridge_dark_mode images bigger. Align them to make their top margins same level with the slider. logo_dark_mode should be rectangular. Refer to the web-design.jpg.
 
 ## Color Palette
 - Primary color: #791218 (School red)

@@ -352,7 +352,6 @@ export function NewsTable() {
       setIsSaving(false)
     }
   }
-  }
 
   const hasActiveFilters = selectedCategories.length > 0 || dateRange.from || dateRange.to || searchQuery
 
