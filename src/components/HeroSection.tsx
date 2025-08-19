@@ -2,16 +2,37 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { getSliderImages, SliderImage } from '@/lib/slider';
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const slides = [
-    { src: '/slider-01.png', alt: 'Blossom Private School' },
-    { src: '/slider-02.png', alt: 'Campus Life' },
-    { src: '/slider-03.png', alt: 'Academic Excellence' }
-  ];
+  const [slides, setSlides] = useState<SliderImage[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchSlides = async () => {
+      try {
+        const images = await getSliderImages();
+        setSlides(images);
+      } catch (error) {
+        console.error('Error fetching slider images:', error);
+        // Fallback to default images
+        setSlides([
+          { id: '1', title: 'Blossom Private School', alt_text: 'Blossom Private School', image_url: '/slider-01.png', display_order: 1, is_active: true, created_at: '', updated_at: '' },
+          { id: '2', title: 'Campus Life', alt_text: 'Campus Life', image_url: '/slider-02.png', display_order: 2, is_active: true, created_at: '', updated_at: '' },
+          { id: '3', title: 'Academic Excellence', alt_text: 'Academic Excellence', image_url: '/slider-03.png', display_order: 3, is_active: true, created_at: '', updated_at: '' }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSlides();
+  }, []);
+
+  useEffect(() => {
+    if (slides.length === 0) return;
+    
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
@@ -81,22 +102,26 @@ const HeroSection = () => {
             <div className="hero-slider" style={{ width: '100%', height: '350px' }}>
               <div className="slider-container" style={{ width: '100%', height: '350px' }}>
                 {/* Slides */}
-                {slides.map((slide, index) => (
-                  <div
-                    key={index}
-                    className={`slide ${index === currentSlide ? 'active' : ''}`}
-                    style={{ width: '100%', height: '350px' }}
-                  >
-                    <Image
-                      src={slide.src}
-                      alt={slide.alt}
-                      width={600}
-                      height={350}
-                      className="hero-img"
-                      style={{ width: '100%', height: '350px', objectFit: 'cover' }}
-                    />
-                  </div>
-                ))}
+                {loading ? (
+                  <div className="w-full h-full bg-gray-200 animate-pulse rounded"></div>
+                ) : (
+                  slides.map((slide, index) => (
+                    <div
+                      key={slide.id}
+                      className={`slide ${index === currentSlide ? 'active' : ''}`}
+                      style={{ width: '100%', height: '350px' }}
+                    >
+                      <Image
+                        src={slide.image_url}
+                        alt={slide.alt_text}
+                        width={600}
+                        height={350}
+                        className="hero-img"
+                        style={{ width: '100%', height: '350px', objectFit: 'cover' }}
+                      />
+                    </div>
+                  ))
+                )}
               </div>
 
               {/* Navigation Arrows */}
@@ -104,15 +129,17 @@ const HeroSection = () => {
               <button className="slider-nav slider-next" onClick={nextSlide}>›</button>
 
               {/* Dots */}
-              <div className="slider-dots">
-                {slides.map((_, index) => (
-                  <span
-                    key={index}
-                    className={`dot ${index === currentSlide ? 'active' : ''}`}
-                    onClick={() => goToSlide(index)}
-                  />
-                ))}
-              </div>
+              {!loading && (
+                <div className="slider-dots">
+                  {slides.map((_, index) => (
+                    <span
+                      key={index}
+                      className={`dot ${index === currentSlide ? 'active' : ''}`}
+                      onClick={() => goToSlide(index)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
             
             {/* Pencil decoration - moved outside slider */}

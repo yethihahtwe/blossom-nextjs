@@ -272,5 +272,44 @@ CREATE POLICY "Authenticated users can manage notifications" ON notifications
 
 -- Note: Use service role key for admin operations to bypass RLS securely
 
+-- Slider Images Table
+CREATE TABLE IF NOT EXISTS slider_images (
+  id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+  title VARCHAR(255) NOT NULL,
+  alt_text VARCHAR(255) NOT NULL,
+  image_url TEXT NOT NULL,
+  display_order INTEGER NOT NULL DEFAULT 0,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Create indexes for slider images
+CREATE INDEX IF NOT EXISTS idx_slider_images_display_order ON slider_images(display_order);
+CREATE INDEX IF NOT EXISTS idx_slider_images_is_active ON slider_images(is_active);
+
+-- Create trigger to automatically update updated_at for slider images
+CREATE TRIGGER update_slider_images_updated_at 
+  BEFORE UPDATE ON slider_images 
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- Set up Row Level Security for slider images
+ALTER TABLE slider_images ENABLE ROW LEVEL SECURITY;
+
+-- Allow public read access to active slider images
+CREATE POLICY "Allow public read access to active slider images" ON slider_images
+  FOR SELECT USING (is_active = true);
+
+-- Allow authenticated users to manage all slider images (admin operations)
+CREATE POLICY "Authenticated users can manage slider images" ON slider_images
+  FOR ALL USING (auth.uid() IS NOT NULL);
+
+-- Insert default slider images
+INSERT INTO slider_images (title, alt_text, image_url, display_order, is_active) VALUES
+('Blossom Private School', 'Blossom Private School', '/slider-01.png', 1, true),
+('Campus Life', 'Campus Life', '/slider-02.png', 2, true),
+('Academic Excellence', 'Academic Excellence', '/slider-03.png', 3, true)
+ON CONFLICT DO NOTHING;
+
 -- Note: For admin operations (create, update, delete), you'll need to set up authentication
 -- and create appropriate policies for authenticated users with admin roles

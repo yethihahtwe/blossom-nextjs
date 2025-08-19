@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Images,
 } from 'lucide-react'
 
 const navigation = [
@@ -31,6 +32,11 @@ const navigation = [
     name: 'Announcements',
     href: '/admin/announcements',
     icon: Megaphone,
+  },
+  {
+    name: 'Slider',
+    href: '/admin/slider',
+    icon: Images,
   },
   {
     name: 'Users',
