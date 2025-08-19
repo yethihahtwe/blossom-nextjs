@@ -3,7 +3,8 @@
 import { useState, useRef } from 'react'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { X, Loader2, Image } from 'lucide-react'
+import { X, Loader2, Image as ImageIcon } from 'lucide-react'
+import Image from 'next/image'
 import { uploadImage } from '@/lib/storage'
 import toast from 'react-hot-toast'
 
@@ -106,9 +107,11 @@ export function ImageUpload({ value, onChange, label = 'Image', className = '', 
         // Show uploaded image
         <div className="mt-2 space-y-2">
           <div className="relative inline-block">
-            <img
+            <Image
               src={value}
               alt="Uploaded image"
+              width={128}
+              height={128}
               className="h-32 w-32 object-cover rounded-lg border border-gray-300 dark:border-gray-600"
             />
             <Button
@@ -156,7 +159,7 @@ export function ImageUpload({ value, onChange, label = 'Image', className = '', 
             </div>
           ) : (
             <div className="space-y-2">
-              <Image className="h-8 w-8 mx-auto text-gray-400" />
+              <ImageIcon className="h-8 w-8 mx-auto text-gray-400" />
               <div>
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
                   Click to upload or drag and drop

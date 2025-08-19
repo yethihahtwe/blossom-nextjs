@@ -1,32 +1,9 @@
 import { supabase } from './supabase';
 import { supabaseAdmin } from './supabase-admin';
+import { SliderImage, CreateSliderImageData, UpdateSliderImageData } from './types/slider';
 
-export interface SliderImage {
-  id: string;
-  title: string;
-  alt_text: string;
-  image_url: string;
-  display_order: number;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface CreateSliderImageData {
-  title: string;
-  alt_text: string;
-  image_url: string;
-  display_order: number;
-  is_active?: boolean;
-}
-
-export interface UpdateSliderImageData {
-  title?: string;
-  alt_text?: string;
-  image_url?: string;
-  display_order?: number;
-  is_active?: boolean;
-}
+// Re-export types for backward compatibility
+export type { SliderImage, CreateSliderImageData, UpdateSliderImageData };
 
 export async function getSliderImages(): Promise<SliderImage[]> {
   const { data, error } = await supabase

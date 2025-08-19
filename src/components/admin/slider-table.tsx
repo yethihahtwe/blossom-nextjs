@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { SliderImage } from '@/lib/slider'
+import { SliderImage } from '@/lib/types/slider'
 import Image from 'next/image'
 import { ImageUpload } from '@/components/ui/image-upload'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -11,14 +11,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -240,7 +232,7 @@ export function SliderTable() {
     }
   }
 
-  const handleDragEnd = async (result: any) => {
+  const handleDragEnd = async (result: { destination?: { index: number } | null; source: { index: number }; }) => {
     if (!result.destination) return
 
     const reorderedImages = Array.from(filteredImages)
@@ -726,7 +718,7 @@ export function SliderTable() {
               Delete Slider Image
             </AlertDialogTitle>
             <AlertDialogDescription className="text-gray-600 dark:text-gray-400 admin-panel">
-              Are you sure you want to delete "{selectedImage?.title}"? This action cannot be undone and will remove the image from the homepage slider.
+              Are you sure you want to delete &quot;{selectedImage?.title}&quot;? This action cannot be undone and will remove the image from the homepage slider.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="gap-2">

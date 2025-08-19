@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { getSliderImages, SliderImage } from '@/lib/slider';
+import { SliderImage } from '@/lib/types/slider';
 
 const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -12,8 +12,14 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchSlides = async () => {
       try {
-        const images = await getSliderImages();
-        setSlides(images);
+        // Fetch from public API endpoint instead of direct database call
+        const response = await fetch('/api/slider');
+        if (response.ok) {
+          const images = await response.json();
+          setSlides(images);
+        } else {
+          throw new Error('Failed to fetch slider images');
+        }
       } catch (error) {
         console.error('Error fetching slider images:', error);
         // Fallback to default images
