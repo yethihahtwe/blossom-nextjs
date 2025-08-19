@@ -5,41 +5,45 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { X, Loader2, Image } from 'lucide-react'
 import { uploadImage } from '@/lib/storage'
+import toast from 'react-hot-toast'
 
 interface ImageUploadProps {
   value?: string
   onChange: (url: string) => void
   label?: string
   className?: string
+  folder?: string
 }
 
-export function ImageUpload({ value, onChange, label = 'Image', className = '' }: ImageUploadProps) {
+export function ImageUpload({ value, onChange, label = 'Image', className = '', folder = 'general' }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [dragActive, setDragActive] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = async (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
+      toast.error('Please select an image file')
       return
     }
 
     if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      alert('File size must be less than 5MB')
+      toast.error('File size must be less than 5MB')
       return
     }
 
     setIsUploading(true)
     try {
-      const url = await uploadImage(file)
+      console.log('Uploading file to folder:', folder)
+      const url = await uploadImage(file, folder)
       if (url) {
+        toast.success('Image uploaded successfully!')
         onChange(url)
       } else {
-        alert('Failed to upload image')
+        toast.error('Failed to upload image. Please check your Supabase storage configuration.')
       }
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Failed to upload image')
+      toast.error(`Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsUploading(false)
     }

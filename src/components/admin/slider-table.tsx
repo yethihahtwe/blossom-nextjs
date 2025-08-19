@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { SliderImage } from '@/lib/slider'
 import Image from 'next/image'
+import { ImageUpload } from '@/components/ui/image-upload'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import toast from 'react-hot-toast'
 import { Button } from '@/components/ui/button'
@@ -582,12 +583,11 @@ export function SliderTable() {
             </div>
             
             <div>
-              <Label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Image URL *</Label>
-              <Input
+              <ImageUpload
+                label="Slider Image *"
                 value={createForm.image_url}
-                onChange={(e) => setCreateForm(prev => ({ ...prev, image_url: e.target.value }))}
-                placeholder="Enter image URL"
-                className="admin-panel"
+                onChange={(url) => setCreateForm(prev => ({ ...prev, image_url: url }))}
+                folder="slider"
               />
             </div>
             
@@ -667,12 +667,11 @@ export function SliderTable() {
             </div>
             
             <div>
-              <Label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Image URL *</Label>
-              <Input
+              <ImageUpload
+                label="Slider Image *"
                 value={editForm.image_url}
-                onChange={(e) => setEditForm(prev => ({ ...prev, image_url: e.target.value }))}
-                placeholder="Enter image URL"
-                className="admin-panel"
+                onChange={(url) => setEditForm(prev => ({ ...prev, image_url: url }))}
+                folder="slider"
               />
             </div>
             

@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { supabaseAdmin } from './supabase-admin';
 
 export interface SliderImage {
   id: string;
@@ -43,7 +44,7 @@ export async function getSliderImages(): Promise<SliderImage[]> {
 }
 
 export async function getAllSliderImages(): Promise<SliderImage[]> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('slider_images')
     .select('*')
     .order('display_order', { ascending: true });
@@ -57,7 +58,7 @@ export async function getAllSliderImages(): Promise<SliderImage[]> {
 }
 
 export async function getSliderImageById(id: string): Promise<SliderImage | null> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('slider_images')
     .select('*')
     .eq('id', id)
@@ -72,7 +73,7 @@ export async function getSliderImageById(id: string): Promise<SliderImage | null
 }
 
 export async function createSliderImage(imageData: CreateSliderImageData): Promise<SliderImage> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('slider_images')
     .insert([imageData])
     .select()
@@ -87,7 +88,7 @@ export async function createSliderImage(imageData: CreateSliderImageData): Promi
 }
 
 export async function updateSliderImage(id: string, updates: UpdateSliderImageData): Promise<SliderImage> {
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('slider_images')
     .update(updates)
     .eq('id', id)
@@ -103,7 +104,7 @@ export async function updateSliderImage(id: string, updates: UpdateSliderImageDa
 }
 
 export async function deleteSliderImage(id: string): Promise<void> {
-  const { error } = await supabase
+  const { error } = await supabaseAdmin
     .from('slider_images')
     .delete()
     .eq('id', id);
@@ -121,7 +122,7 @@ export async function reorderSliderImages(imageIds: string[]): Promise<void> {
   }));
 
   for (const update of updates) {
-    const { error } = await supabase
+    const { error } = await supabaseAdmin
       .from('slider_images')
       .update({ display_order: update.display_order })
       .eq('id', update.id);

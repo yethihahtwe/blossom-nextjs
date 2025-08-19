@@ -1,47 +1,42 @@
 diff --git a/src/components/admin/slider-table.tsx b/src/components/admin/slider-table.tsx
-index abc123..def456 100644
+index 1234567..8901234 100644
 --- a/src/components/admin/slider-table.tsx
 +++ b/src/components/admin/slider-table.tsx
-@@ -3,6 +3,7 @@
- import { useState, useEffect } from 'react'
+@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
  import { SliderImage } from '@/lib/slider'
  import Image from 'next/image'
+ import { ImageUpload } from '@/components/ui/image-upload'
 +import { ImageUpload } from '@/components/ui/image-upload'
  import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
  import toast from 'react-hot-toast'
  import { Button } from '@/components/ui/button'
-@@ -486,15 +487,11 @@ export function SliderTable() {
+@@ -583,11 +584,9 @@ export function SliderTable() {
              </div>
-
+             
              <div>
 -              <Label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Image URL *</Label>
 -              <Input
 +              <ImageUpload
 +                label="Slider Image *"
                  value={createForm.image_url}
--                onChange={(e) => setCreateForm(prev => ({ ...prev, image_url:e.target.value }))}
+-                onChange={(e) => setCreateForm(prev => ({ ...prev, image_url: e.target.value }))}
 -                placeholder="Enter image URL"
 -                className="admin-panel"
 +                onChange={(url) => setCreateForm(prev => ({ ...prev, image_url: url }))}
                />
              </div>
-
-             <div className="flex items-center space-x-2">
-@@ -551,15 +548,11 @@ export function SliderTable() {
+@@ -668,11 +667,9 @@ export function SliderTable() {
              </div>
-
+             
              <div>
 -              <Label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Image URL *</Label>
 -              <Input
 +              <ImageUpload
 +                label="Slider Image *"
                  value={editForm.image_url}
--                onChange={(e) => setEditForm(prev => ({ ...prev, image_url: e.target.value
- }))}
+-                onChange={(e) => setEditForm(prev => ({ ...prev, image_url: e.target.value }))}
 -                placeholder="Enter image URL"
 -                className="admin-panel"
 +                onChange={(url) => setEditForm(prev => ({ ...prev, image_url: url }))}
                />
              </div>
-
-             <div className="flex items-center space-x-2">

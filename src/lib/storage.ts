@@ -27,7 +27,7 @@ export class StorageService {
 
       if (error) {
         console.error('Error uploading file:', error)
-        return null
+        throw new Error(`Storage upload failed: ${error.message}`)
       }
 
       // Get public URL
@@ -71,8 +71,8 @@ export class StorageService {
 }
 
 // Legacy functions for backward compatibility
-export async function uploadImage(file: File, bucket: string = 'images'): Promise<string | null> {
-  return StorageService.uploadImage(file, 'news', bucket)
+export async function uploadImage(file: File, folder: string = 'general', bucket: string = 'images'): Promise<string | null> {
+  return StorageService.uploadImage(file, folder, bucket)
 }
 
 export async function deleteImage(url: string, bucket: string = 'images'): Promise<boolean> {
