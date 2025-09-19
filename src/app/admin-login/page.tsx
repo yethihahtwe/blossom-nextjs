@@ -162,13 +162,6 @@ export default function AdminLoginPage() {
             </div>
           </CardContent>
         </Card>
-
-        {/* Development Note */}
-        <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400">
-            For development: Use any valid Supabase user credentials
-          </p>
-        </div>
       </div>
     </div>
   )
