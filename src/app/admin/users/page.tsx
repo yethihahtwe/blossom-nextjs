@@ -29,7 +29,7 @@ import { Search, Plus, Edit, Trash2, MoreHorizontal, AlertTriangle, User as User
 import toast from 'react-hot-toast'
 
 interface AdminUser extends User {
-  role?: 'admin' | 'editor' | 'viewer'
+  role?: 'admin' | 'editor'
   last_sign_in?: string
 }
 
@@ -49,11 +49,11 @@ export default function UsersPage() {
   const [createForm, setCreateForm] = useState({
     email: '',
     password: '',
-    role: 'viewer' as 'admin' | 'editor' | 'viewer'
+    role: 'editor' as 'admin' | 'editor'
   })
   
   const [editForm, setEditForm] = useState({
-    role: 'viewer' as 'admin' | 'editor' | 'viewer'
+    role: 'editor' as 'admin' | 'editor'
   })
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function UsersPage() {
       }
 
       setCreateModalOpen(false)
-      setCreateForm({ email: '', password: '', role: 'viewer' })
+      setCreateForm({ email: '', password: '', role: 'editor' })
       toast.success('User created successfully!')
       loadUsers()
     } catch (error) {
@@ -195,7 +195,7 @@ export default function UsersPage() {
   const handleEdit = (user: AdminUser) => {
     setSelectedUser(user)
     setEditForm({
-      role: user.role || 'viewer'
+      role: user.role || 'editor'
     })
     setEditModalOpen(true)
   }
@@ -208,12 +208,11 @@ export default function UsersPage() {
   const getRoleBadge = (role: string) => {
     const variants = {
       admin: 'bg-red-100 text-red-800 hover:bg-red-100',
-      editor: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100',
-      viewer: 'bg-blue-100 text-blue-800 hover:bg-blue-100'
+      editor: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
     }
     
     return (
-      <Badge className={variants[role as keyof typeof variants] || variants.viewer}>
+      <Badge className={variants[role as keyof typeof variants] || variants.editor}>
         {role?.charAt(0).toUpperCase() + role?.slice(1)}
       </Badge>
     )
@@ -328,7 +327,7 @@ export default function UsersPage() {
                     </div>
                   </div>
                 </TableCell>
-                <TableCell className="py-4 px-4">{getRoleBadge(user.role || 'viewer')}</TableCell>
+                <TableCell className="py-4 px-4">{getRoleBadge(user.role || 'editor')}</TableCell>
                 <TableCell className="text-gray-600 dark:text-gray-300 py-4 px-4">{formatDate(user.last_sign_in_at)}</TableCell>
                 <TableCell className="text-gray-600 dark:text-gray-300 py-4 px-4">{formatDate(user.created_at)}</TableCell>
                 <TableCell className="text-right py-4 px-4">
@@ -422,10 +421,9 @@ export default function UsersPage() {
               <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Role</label>
               <select
                 value={createForm.role}
-                onChange={(e) => setCreateForm(prev => ({ ...prev, role: e.target.value as 'admin' | 'editor' | 'viewer' }))}
+                onChange={(e) => setCreateForm(prev => ({ ...prev, role: e.target.value as 'admin' | 'editor' }))}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
               >
-                <option value="viewer">Viewer - Read only access</option>
                 <option value="editor">Editor - Can create and edit content</option>
                 <option value="admin">Admin - Full access</option>
               </select>
@@ -467,10 +465,9 @@ export default function UsersPage() {
               <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Role</label>
               <select
                 value={editForm.role}
-                onChange={(e) => setEditForm(prev => ({ ...prev, role: e.target.value as 'admin' | 'editor' | 'viewer' }))}
+                onChange={(e) => setEditForm(prev => ({ ...prev, role: e.target.value as 'admin' | 'editor' }))}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-white admin-panel text-sm md:text-sm"
               >
-                <option value="viewer">Viewer - Read only access</option>
                 <option value="editor">Editor - Can create and edit content</option>
                 <option value="admin">Admin - Full access</option>
               </select>

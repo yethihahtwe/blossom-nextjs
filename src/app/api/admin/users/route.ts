@@ -24,7 +24,7 @@ export async function GET() {
     // Merge user data with profiles
     const usersWithRoles = users.map(user => ({
       ...user,
-      role: profiles?.find(p => p.user_id === user.id)?.role || 'viewer'
+      role: profiles?.find(p => p.user_id === user.id)?.role || 'editor'
     }))
 
     return NextResponse.json({ users: usersWithRoles })
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         .from('user_profiles')
         .insert({
           user_id: data.user.id,
-          role: role || 'viewer',
+          role: role || 'editor',
           email
         })
 
